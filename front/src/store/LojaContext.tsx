@@ -1,6 +1,5 @@
-import { createContext, useContext, useMemo, useState } from "react";
-import { produtosMock } from "../data/produtos.mock";
-import { depoimentosMock } from "../data/produtos.mock";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { supabase } from "../lib/supabase";
 import {
   ICredenciaisLogin,
   IFormularioCadastro,
@@ -29,14 +28,14 @@ interface ILojaContextData {
   fecharDetalhesProduto: () => void;
   adicionarAoCarrinho: (produtoId: number) => void;
   removerDoCarrinho: (produtoId: number) => void;
-  adicionarProduto: (novoProduto: Omit<IProduto, "id">) => void;
-  atualizarProduto: (produtoAtualizado: IProduto) => void;
-  removerProduto: (produtoId: number) => void;
-  adicionarDepoimento: (novoDepoimento: Omit<IDepoimento, "id">) => void;
-  atualizarDepoimento: (depoimentoAtualizado: IDepoimento) => void;
-  removerDepoimento: (depoimentoId: number) => void;
+  adicionarProduto: (novoProduto: Omit<IProduto, "id">) => Promise<void>;
+  atualizarProduto: (produtoAtualizado: IProduto) => Promise<void>;
+  removerProduto: (produtoId: number) => Promise<void>;
+  adicionarDepoimento: (novoDepoimento: Omit<IDepoimento, "id">) => Promise<void>;
+  atualizarDepoimento: (depoimentoAtualizado: IDepoimento) => Promise<void>;
+  removerDepoimento: (depoimentoId: number) => Promise<void>;
   atualizarTextoSite: (chave: keyof ITextosSite, valor: string) => void;
-  atualizarSecaoHome: (identificador: string, dados: ISecaoHome) => void;
+  atualizarSecaoHome: (identificador: string, dados: ISecaoHome) => Promise<void>;
   alternarModoEdicao: () => void;
   login: (dados: ICredenciaisLogin) => void;
   cadastrar: (dados: IFormularioCadastro) => void;
@@ -46,46 +45,62 @@ interface ILojaContextData {
 const LojaContext = createContext<ILojaContextData | undefined>(undefined);
 
 export function LojaProvider({ children }: { children: React.ReactNode }): JSX.Element {
-  const [produtos, setProdutos] = useState<IProduto[]>(
-    produtosMock.map((p, index) => ({ ...p, destaqueCarrossel: index % 2 === 0 })) // mock de destaques
-  );
-  const [depoimentos, setDepoimentos] = useState<IDepoimento[]>(depoimentosMock);
+  const [produtos, setProdutos] = useState<IProduto[]>([]);
+  const [depoimentos, setDepoimentos] = useState<IDepoimento[]>([]);
+  const [secoesHome, setSecoesHome] = useState<ISecaoHome[]>([]);
+
   const [textosSite, setTextosSite] = useState<ITextosSite>({
     tituloLoja: "Luar Moveis",
     legendaLoja: "Curadoria boutique de moveis para ambientes classicos, elegantes e atemporais.",
     secaoApresentacaoTitulo: "Uma jornada de design e conforto",
-    secaoApresentacaoTexto:
-      "Na Luar Moveis, cada peca e apresentada como uma experiencia de estilo, com narrativa visual refinada e consultoria personalizada.",
+    secaoApresentacaoTexto: "Na Luar Moveis, cada peca e apresentada como uma experiencia...",
     secaoProdutosTitulo: "Colecao exclusiva de moveis",
-    secaoProdutosTexto:
-      "Explore pecas selecionadas para quem busca sofisticacao, ergonomia e excelente qualidade de acabamento.",
+    secaoProdutosTexto: "Explore pecas selecionadas...",
     secaoExperienciasTitulo: "Experiencias de clientes"
   });
 
-  const [secoesHome, setSecoesHome] = useState<ISecaoHome[]>([
-    {
-      identificador: 'hero',
-      tituloSecao: 'Hero Principal',
-      ordem: 1,
-      ativo: true,
-      conteudo: {
-        kicker: "Boutique · São Paulo",
-        titulo_linha1: "Luar",
-        titulo_linha2: "Móveis",
-        tagline: "A quiet expression of timeless living.",
-        descricao: "Curadoria boutique de móveis para ambientes clássicos, elegantes e atemporais.",
-        cta_1_texto: "Explorar coleção",
-        cta_2_texto: "Ver ambientes",
-        imagem_url: ""
-      }
-    }
-  ]);
-
   const [itensCarrinho, setItensCarrinho] = useState<IItemCarrinho[]>([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState<IProduto | null>(null);
+
+  // Fake Auth para não quebrar a UI antes do Supabase Auth total:
   const [usuarioLogado, setUsuarioLogado] = useState<boolean>(false);
   const [tipoUsuario, setTipoUsuario] = useState<TipoUsuario>("normal");
   const [modoEdicao, setModoEdicao] = useState<boolean>(false);
+
+  // FETCH SUPABASE DATA
+  useEffect(() => {
+    async function loadData() {
+      const { data: prodData } = await supabase.from('produtos').select('*').order('id', { ascending: false });
+      if (prodData) {
+        setProdutos(prodData.map((p: any) => ({
+          id: p.id,
+          nome: p.nome,
+          categoria: p.categoria,
+          descricaoCurta: p.descricao_curta,
+          descricaoLonga: p.descricao_longa,
+          preco: Number(p.preco),
+          estoque: p.estoque,
+          imagem: p.imagem,
+          destaqueCarrossel: p.destaque_carrossel
+        })));
+      }
+
+      const { data: depoData } = await supabase.from('depoimentos').select('*').order('id', { ascending: false });
+      if (depoData) setDepoimentos(depoData);
+
+      const { data: homeData } = await supabase.from('secoes_home').select('*').eq('ativo', true);
+      if (homeData) {
+        setSecoesHome(homeData.map((s: any) => ({
+          identificador: s.identificador,
+          tituloSecao: s.titulo_secao,
+          ordem: s.ordem,
+          ativo: s.ativo,
+          conteudo: s.conteudo
+        })));
+      }
+    }
+    loadData();
+  }, []);
 
   function selecionarProduto(produto: IProduto): void {
     setProdutoSelecionado(produto);
@@ -96,126 +111,116 @@ export function LojaProvider({ children }: { children: React.ReactNode }): JSX.E
   }
 
   function adicionarAoCarrinho(produtoId: number): void {
-    setItensCarrinho((estadoAnterior) => {
-      const itemExistente = estadoAnterior.find((item) => item.produtoId === produtoId);
+    setItensCarrinho((prev) => {
+      const itemExistente = prev.find((item) => item.produtoId === produtoId);
       if (itemExistente) {
-        return estadoAnterior.map((item) =>
-          item.produtoId === produtoId
-            ? { ...item, quantidade: item.quantidade + 1 }
-            : item
+        return prev.map((item) =>
+          item.produtoId === produtoId ? { ...item, quantidade: item.quantidade + 1 } : item
         );
       }
-
-      return [...estadoAnterior, { produtoId, quantidade: 1 }];
+      return [...prev, { produtoId, quantidade: 1 }];
     });
   }
 
   function removerDoCarrinho(produtoId: number): void {
-    setItensCarrinho((estadoAnterior) =>
-      estadoAnterior
-        .map((item) =>
-          item.produtoId === produtoId
-            ? { ...item, quantidade: Math.max(item.quantidade - 1, 0) }
-            : item
-        )
+    setItensCarrinho((prev) =>
+      prev
+        .map((item) => item.produtoId === produtoId ? { ...item, quantidade: Math.max(item.quantidade - 1, 0) } : item)
         .filter((item) => item.quantidade > 0)
     );
   }
 
-  function adicionarProduto(novoProduto: Omit<IProduto, "id">): void {
-    if (tipoUsuario !== "admin") {
-      return;
-    }
+  async function adicionarProduto(novoProduto: Omit<IProduto, "id">) {
+    const { data, error } = await supabase.from('produtos').insert([{
+      nome: novoProduto.nome,
+      categoria: novoProduto.categoria,
+      descricao_curta: novoProduto.descricaoCurta,
+      descricao_longa: novoProduto.descricaoLonga,
+      preco: novoProduto.preco,
+      estoque: novoProduto.estoque,
+      imagem: novoProduto.imagem,
+      destaque_carrossel: novoProduto.destaqueCarrossel || false
+    }]).select('*').single();
 
-    setProdutos((estadoAnterior) => {
-      const novoId = estadoAnterior.length
-        ? Math.max(...estadoAnterior.map((produto) => produto.id)) + 1
-        : 1;
-      return [...estadoAnterior, { ...novoProduto, id: novoId }];
-    });
+    if (!error && data) {
+      setProdutos(prev => [{
+        id: data.id,
+        nome: data.nome,
+        categoria: data.categoria,
+        descricaoCurta: data.descricao_curta,
+        descricaoLonga: data.descricao_longa,
+        preco: Number(data.preco),
+        estoque: data.estoque,
+        imagem: data.imagem,
+        destaqueCarrossel: data.destaque_carrossel
+      }, ...prev]);
+    }
   }
 
-  function atualizarProduto(produtoAtualizado: IProduto): void {
-    if (tipoUsuario !== "admin") {
-      return;
-    }
+  async function atualizarProduto(produtoAtualizado: IProduto) {
+    const { error } = await supabase.from('produtos').update({
+      nome: produtoAtualizado.nome,
+      categoria: produtoAtualizado.categoria,
+      descricao_curta: produtoAtualizado.descricaoCurta,
+      descricao_longa: produtoAtualizado.descricaoLonga,
+      preco: produtoAtualizado.preco,
+      estoque: produtoAtualizado.estoque,
+      imagem: produtoAtualizado.imagem,
+      destaque_carrossel: produtoAtualizado.destaqueCarrossel || false
+    }).eq('id', produtoAtualizado.id);
 
-    setProdutos((estadoAnterior) =>
-      estadoAnterior.map((produto) =>
-        produto.id === produtoAtualizado.id ? produtoAtualizado : produto
-      )
-    );
+    if (!error) {
+      setProdutos(prev => prev.map(p => p.id === produtoAtualizado.id ? produtoAtualizado : p));
+    }
   }
 
-  function removerProduto(produtoId: number): void {
-    if (tipoUsuario !== "admin") {
-      return;
+  async function removerProduto(produtoId: number) {
+    const { error } = await supabase.from('produtos').delete().eq('id', produtoId);
+    if (!error) {
+      setProdutos(prev => prev.filter(p => p.id !== produtoId));
     }
-
-    setProdutos((estadoAnterior) => estadoAnterior.filter((produto) => produto.id !== produtoId));
   }
 
-  function adicionarDepoimento(novoDepoimento: Omit<IDepoimento, "id">): void {
-    if (tipoUsuario !== "admin") {
-      return;
+  async function adicionarDepoimento(novo: Omit<IDepoimento, "id">) {
+    const { data, error } = await supabase.from('depoimentos').insert([novo]).select('*').single();
+    if (!error && data) {
+      setDepoimentos(prev => [data, ...prev]);
     }
-
-    setDepoimentos((estadoAnterior) => {
-      const novoId = estadoAnterior.length
-        ? Math.max(...estadoAnterior.map((depoimento) => depoimento.id)) + 1
-        : 1;
-      return [...estadoAnterior, { ...novoDepoimento, id: novoId }];
-    });
   }
 
-  function atualizarDepoimento(depoimentoAtualizado: IDepoimento): void {
-    if (tipoUsuario !== "admin") {
-      return;
+  async function atualizarDepoimento(atualizado: IDepoimento) {
+    const { error } = await supabase.from('depoimentos').update(atualizado).eq('id', atualizado.id);
+    if (!error) {
+      setDepoimentos(prev => prev.map(d => d.id === atualizado.id ? atualizado : d));
     }
-
-    setDepoimentos((estadoAnterior) =>
-      estadoAnterior.map((depoimento) =>
-        depoimento.id === depoimentoAtualizado.id ? depoimentoAtualizado : depoimento
-      )
-    );
   }
 
-  function removerDepoimento(depoimentoId: number): void {
-    if (tipoUsuario !== "admin") {
-      return;
+  async function removerDepoimento(id: number) {
+    const { error } = await supabase.from('depoimentos').delete().eq('id', id);
+    if (!error) {
+      setDepoimentos(prev => prev.filter(d => d.id !== id));
     }
+  }
 
-    setDepoimentos((estadoAnterior) =>
-      estadoAnterior.filter((depoimento) => depoimento.id !== depoimentoId)
-    );
+  async function atualizarSecaoHome(identificador: string, novaSecao: ISecaoHome) {
+    const { error } = await supabase.from('secoes_home').update({
+      titulo_secao: novaSecao.tituloSecao,
+      conteudo: novaSecao.conteudo
+    }).eq('identificador', identificador);
+
+    if (!error) {
+      setSecoesHome(prev => prev.map(s => s.identificador === identificador ? novaSecao : s));
+    }
   }
 
   function atualizarTextoSite(chave: keyof ITextosSite, valor: string): void {
-    if (tipoUsuario !== "admin") {
-      return;
-    }
-
-    setTextosSite((estadoAnterior) => ({
-      ...estadoAnterior,
-      [chave]: valor
-    }));
-  }
-
-  function atualizarSecaoHome(identificador: string, secaoAtualizada: ISecaoHome): void {
     if (tipoUsuario !== "admin") return;
-
-    setSecoesHome((estadoAnterior) =>
-      estadoAnterior.map((secao) =>
-        secao.identificador === identificador ? secaoAtualizada : secao
-      )
-    );
+    setTextosSite(prev => ({ ...prev, [chave]: valor }));
   }
 
   function alternarModoEdicao(): void {
-    if (tipoUsuario !== "admin") {
-      return;
-    }
-    setModoEdicao((estadoAnterior) => !estadoAnterior);
+    if (tipoUsuario !== "admin") return;
+    setModoEdicao(prev => !prev);
   }
 
   function login(dados: ICredenciaisLogin): void {
@@ -235,18 +240,14 @@ export function LojaProvider({ children }: { children: React.ReactNode }): JSX.E
   }
 
   const totalItensCarrinho = useMemo(
-    () => itensCarrinho.reduce((acumulador, item) => acumulador + item.quantidade, 0),
+    () => itensCarrinho.reduce((acc, item) => acc + item.quantidade, 0),
     [itensCarrinho]
   );
 
   const subtotalCarrinho = useMemo(() => {
-    return itensCarrinho.reduce((acumulador, item) => {
-      const produto = produtos.find((p) => p.id === item.produtoId);
-      if (!produto) {
-        return acumulador;
-      }
-
-      return acumulador + produto.preco * item.quantidade;
+    return itensCarrinho.reduce((acc, item) => {
+      const p = produtos.find((x) => x.id === item.produtoId);
+      return p ? acc + p.preco * item.quantidade : acc;
     }, 0);
   }, [itensCarrinho, produtos]);
 
