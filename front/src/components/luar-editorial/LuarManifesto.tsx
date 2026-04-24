@@ -2,19 +2,24 @@ import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { IMAGES } from "./assets";
 import { easeEditorial } from "./motionPresets";
-
-const lines = [
-  "Cada peça nasce do equilíbrio entre matéria, luz e tempo — um gesto silencioso que acolhe o cotidiano sem apressar o olhar.",
-  "Na Luar Móveis, cada peça é apresentada como uma experiência: o toque da madeira, o desenho da costura, a calma de um ambiente que respira.",
-];
+import { useLoja } from "../../store/LojaContext";
 
 export function LuarManifesto(): JSX.Element {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.9", "end 0.1"] });
 
-  const yBack  = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, -40]);
-  const yMid   = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, -20]);
+  const { secoesHome } = useLoja();
+  const manifestoSection = secoesHome.find(s => s.identificador === 'manifesto');
+  const conteudo = manifestoSection?.conteudo || {};
+
+  const lines = [
+    conteudo.linha1 || "Cada peça nasce do equilíbrio entre matéria, luz e tempo — um gesto silencioso que acolhe o cotidiano sem apressar o olhar.",
+    conteudo.linha2 || "Na Luar Móveis, cada peça é apresentada como uma experiência: o toque da madeira, o desenho da costura, a calma de um ambiente que respira."
+  ].filter(Boolean);
+
+  const yBack = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, -40]);
+  const yMid = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, -20]);
   const yFront = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, -58]);
 
   return (
@@ -72,9 +77,7 @@ export function LuarManifesto(): JSX.Element {
             viewport={{ once: true, margin: "-12%" }}
             transition={easeEditorial}
           >
-            Criamos móveis como quem compõe
-            <br />
-            <em className="font-light italic">um espaço de silêncio.</em>
+            <span dangerouslySetInnerHTML={{ __html: conteudo.titulo || "Criamos móveis como quem compõe<br/><em class=\"font-light italic\">um espaço de silêncio.</em>" }} />
           </motion.h2>
 
           {/* Animated gold accent line */}
@@ -115,10 +118,10 @@ export function LuarManifesto(): JSX.Element {
               className="font-display font-light italic leading-[1.65] text-charcoal/70"
               style={{ fontSize: "clamp(1.05rem,1.5vw,1.3rem)" }}
             >
-              "Móveis que envelhecem como a madeira — com graça e sem pressa."
+              {conteudo.citacao || `"Móveis que envelhecem como a madeira — com graça e sem pressa."`}
             </p>
             <p className="mt-3 font-sans text-[0.75rem] uppercase tracking-[0.28em] text-mist/60">
-              — Fundador, Luar Móveis
+              {conteudo.autor || "— Fundador, Luar Móveis"}
             </p>
           </motion.blockquote>
         </div>
@@ -130,7 +133,7 @@ export function LuarManifesto(): JSX.Element {
             className="absolute -right-2 top-4 h-[50%] w-[56%] overflow-hidden rounded-[2px] shadow-[0_32px_72px_-20px_rgba(28,25,23,0.30)] sm:right-0 sm:top-8 sm:w-[50%]"
           >
             <img
-              src={IMAGES.manifestoBack}
+              src={conteudo.imagem_back || IMAGES.manifestoBack}
               alt=""
               className="h-full w-full scale-[1.08] object-cover blur-[2.5px] brightness-[0.88] saturate-[0.82]"
             />
@@ -141,7 +144,7 @@ export function LuarManifesto(): JSX.Element {
             className="absolute left-0 top-[26%] z-[2] h-[44%] w-[48%] overflow-hidden rounded-[3px] shadow-[0_36px_82px_-18px_rgba(28,25,23,0.38)] sm:left-4 sm:w-[46%]"
           >
             <img
-              src={IMAGES.manifestoMid}
+              src={conteudo.imagem_mid || IMAGES.manifestoMid}
               alt=""
               className="h-full w-full object-cover brightness-[0.94]"
             />
@@ -152,7 +155,7 @@ export function LuarManifesto(): JSX.Element {
             className="absolute bottom-2 right-0 z-[3] h-[48%] w-[60%] overflow-hidden rounded-[4px] shadow-[0_44px_100px_-24px_rgba(28,25,23,0.42)] sm:bottom-6 sm:right-4 sm:w-[58%]"
           >
             <img
-              src={IMAGES.manifestoFront}
+              src={conteudo.imagem_front || IMAGES.manifestoFront}
               alt=""
               className="h-full w-full object-cover"
             />

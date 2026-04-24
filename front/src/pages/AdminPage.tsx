@@ -63,6 +63,9 @@ export function AdminPage(): JSX.Element {
   }
 
   const heroSection = secoesHome.find(s => s.identificador === 'hero');
+  const manifestoSection = secoesHome.find(s => s.identificador === 'manifesto');
+  const atmosferaSection = secoesHome.find(s => s.identificador === 'atmosfera');
+  const curadoriaSection = secoesHome.find(s => s.identificador === 'curadoria');
 
   return (
     <section>
@@ -110,6 +113,85 @@ export function AdminPage(): JSX.Element {
             <p className="text-xs text-mist mt-1 italic">
               Nota: Quando o backend rodar, este campo de imagem funcionará através do Upload nativo no Storage do Supabase (is_admin RLS).
             </p>
+          </article>
+        )}
+      </section>
+
+      <section className="mb-8 border-b border-stone-200 pb-8">
+        <h2 className="section-title mb-3 text-xl">Editar Seção: Manifesto</h2>
+        {manifestoSection && (
+          <article className="lux-panel p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-[0.65rem] uppercase tracking-widest text-mist mb-1">Imagem Fundo</label>
+              <input
+                className="field-input"
+                placeholder="Ex: /assets/... ou URL"
+                value={manifestoSection.conteudo.imagem_back || ''}
+                onChange={(e) => atualizarSecaoHome('manifesto', { ...manifestoSection, conteudo: { ...manifestoSection.conteudo, imagem_back: e.target.value } })}
+              />
+            </div>
+            <div>
+              <label className="block text-[0.65rem] uppercase tracking-widest text-mist mb-1">Imagem Meio</label>
+              <input
+                className="field-input"
+                value={manifestoSection.conteudo.imagem_mid || ''}
+                onChange={(e) => atualizarSecaoHome('manifesto', { ...manifestoSection, conteudo: { ...manifestoSection.conteudo, imagem_mid: e.target.value } })}
+              />
+            </div>
+            <div>
+              <label className="block text-[0.65rem] uppercase tracking-widest text-mist mb-1">Imagem Frente</label>
+              <input
+                className="field-input"
+                value={manifestoSection.conteudo.imagem_front || ''}
+                onChange={(e) => atualizarSecaoHome('manifesto', { ...manifestoSection, conteudo: { ...manifestoSection.conteudo, imagem_front: e.target.value } })}
+              />
+            </div>
+          </article>
+        )}
+      </section>
+
+      <section className="mb-8 border-b border-stone-200 pb-8">
+        <h2 className="section-title mb-3 text-xl">Editar Seção: Atmosfera (Imagens)</h2>
+        {atmosferaSection && atmosferaSection.conteudo.ambientes && (
+          <article className="lux-panel p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {atmosferaSection.conteudo.ambientes.map((amb: any, index: number) => (
+              <div key={index}>
+                <label className="block text-[0.65rem] uppercase tracking-widest text-mist mb-1">{amb.title}</label>
+                <input
+                  className="field-input"
+                  placeholder="URL da Imagem"
+                  value={amb.image || ''}
+                  onChange={(e) => {
+                    const newAmbientes = [...atmosferaSection.conteudo.ambientes];
+                    newAmbientes[index].image = e.target.value;
+                    atualizarSecaoHome('atmosfera', { ...atmosferaSection, conteudo: { ...atmosferaSection.conteudo, ambientes: newAmbientes } });
+                  }}
+                />
+              </div>
+            ))}
+          </article>
+        )}
+      </section>
+
+      <section className="mb-8 border-b border-stone-200 pb-8">
+        <h2 className="section-title mb-3 text-xl">Editar Seção: Curadoria (Imagens)</h2>
+        {curadoriaSection && curadoriaSection.conteudo.pieces && (
+          <article className="lux-panel p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {curadoriaSection.conteudo.pieces.map((piece: any, index: number) => (
+              <div key={index}>
+                <label className="block text-[0.65rem] uppercase tracking-widest text-mist mb-1">{piece.name}</label>
+                <input
+                  className="field-input"
+                  placeholder="URL da Imagem"
+                  value={piece.image || ''}
+                  onChange={(e) => {
+                    const newPieces = [...curadoriaSection.conteudo.pieces];
+                    newPieces[index].image = e.target.value;
+                    atualizarSecaoHome('curadoria', { ...curadoriaSection, conteudo: { ...curadoriaSection.conteudo, pieces: newPieces } });
+                  }}
+                />
+              </div>
+            ))}
           </article>
         )}
       </section>

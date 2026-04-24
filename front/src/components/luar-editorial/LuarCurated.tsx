@@ -2,8 +2,9 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { IMAGES } from "./assets";
 import { easeEditorial } from "./motionPresets";
+import { useLoja } from "../../store/LojaContext";
 
-const pieces = [
+const piecesFallback = [
   {
     name: "Sofá Aurora",
     verse: "Linhas baixas, abraço amplo — o lugar onde a tarde se demora.",
@@ -113,7 +114,19 @@ function PieceBlock({
 }
 
 export function LuarCurated(): JSX.Element {
-  const [featured, a, b, wide] = pieces;
+  const { secoesHome } = useLoja();
+  const curadoriaSecao = secoesHome.find(s => s.identificador === 'curadoria');
+  const conteudo = curadoriaSecao?.conteudo || {};
+
+  const lista = conteudo.pieces?.length === 4 ? conteudo.pieces : piecesFallback;
+
+  // We assign fallback images directly here mapped over lista, just to be safe
+  const fallbackLista = lista.map((p: any, i: number) => ({
+    ...p,
+    image: p.image || piecesFallback[i].image
+  }));
+
+  const [featured, a, b, wide] = fallbackLista;
 
   return (
     <section id="curadoria" className="bg-cream px-6 py-28 sm:px-10 md:py-40 lg:px-16">
@@ -146,9 +159,7 @@ export function LuarCurated(): JSX.Element {
               className="max-w-lg font-display font-medium leading-[1.1] text-charcoal"
               style={{ fontSize: "clamp(2.2rem,4.8vw,3.8rem)" }}
             >
-              Peças escolhidas,
-              <br />
-              <em className="font-light italic">não exibidas em série.</em>
+              <span dangerouslySetInnerHTML={{ __html: (conteudo.titulo_linha1 || "Peças escolhidas,") + "<br/><em class=\"font-light italic\">" + (conteudo.titulo_linha2 || "não exibidas em série.") + "</em>" }} />
             </h2>
           </div>
 
