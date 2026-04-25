@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLoja } from "../../store/LojaContext";
 import { easeEditorial } from "./motionPresets";
 import type { IDepoimento } from "../../types/IDepoimento";
+import { EditableSectionField } from "../ui/EditableSectionField";
+import { EditableDepoimentoField } from "../ui/EditableDepoimentoField";
+import { EditableDepoimentoImageField } from "../ui/EditableDepoimentoImageField";
 
 export function LuarExperiencias(): JSX.Element {
   const { depoimentos, isAdmin, modoEdicao, removerDepoimento } = useLoja();
@@ -63,17 +66,32 @@ export function LuarExperiencias(): JSX.Element {
           >
             <div className="mb-5 flex items-center gap-3">
               <div className="h-px w-8 bg-gold-soft/60" />
-              <span className="font-sans text-[0.72rem] uppercase tracking-[0.32em] text-mist">
-                Experiências
-              </span>
+              <EditableSectionField
+                secaoIdentificador="experiencias"
+                conteudoKey="kicker"
+                fallback="Experiências"
+                as="span"
+                className="font-sans text-[0.72rem] uppercase tracking-[0.32em] text-mist"
+              />
             </div>
             <h2
               className="font-display font-medium leading-[1.08] text-charcoal"
               style={{ fontSize: "clamp(2rem,4.5vw,3.4rem)" }}
             >
-              O que nossos clientes
+              <EditableSectionField
+                secaoIdentificador="experiencias"
+                conteudoKey="titulo_linha1"
+                fallback="O que nossos clientes"
+                as="span"
+              />
               <br />
-              <em className="font-light italic text-ink/70">dizem sobre nós</em>
+              <EditableSectionField
+                secaoIdentificador="experiencias"
+                conteudoKey="titulo_linha2"
+                fallback="dizem sobre nós"
+                as="em"
+                className="font-light italic text-ink/70"
+              />
             </h2>
           </motion.div>
 
@@ -91,21 +109,28 @@ export function LuarExperiencias(): JSX.Element {
                   exit={{ opacity: 0, scale: 0.98 }}
                   transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <img
-                    src={`https://picsum.photos/seed/cliente-${dep.id}/800/1000`}
+                  <EditableDepoimentoImageField
+                    depoimento={dep}
+                    fallbackSrc={`https://picsum.photos/seed/cliente-${dep.id}/800/1000`}
                     alt={dep.cliente}
                     className="h-full w-full object-cover"
                   />
                   {/* Gradient bottom */}
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/55 via-transparent to-transparent" />
                   {/* Nome sobre a foto */}
-                  <div className="absolute bottom-6 left-6">
-                    <p className="font-sans text-[0.7rem] font-medium uppercase tracking-[0.28em] text-cream/90">
-                      {dep.cliente}
-                    </p>
-                    <p className="font-sans text-[0.62rem] uppercase tracking-[0.22em] text-gold-soft/80">
-                      {dep.cidade}
-                    </p>
+                  <div className="absolute bottom-6 left-6 w-[80%] pr-4">
+                    <EditableDepoimentoField
+                      depoimentoId={dep.id}
+                      campo="cliente"
+                      as="p"
+                      className="font-sans text-[0.7rem] font-medium uppercase tracking-[0.28em] text-cream/90"
+                    />
+                    <EditableDepoimentoField
+                      depoimentoId={dep.id}
+                      campo="cidade"
+                      as="p"
+                      className="font-sans text-[0.62rem] uppercase tracking-[0.22em] text-gold-soft/80 mt-1"
+                    />
                   </div>
                 </motion.div>
               </AnimatePresence>
@@ -134,23 +159,30 @@ export function LuarExperiencias(): JSX.Element {
                   </span>
 
                   {/* Quote text — grande e legível */}
-                  <blockquote
-                    className="mt-3 font-serif italic leading-[1.65] text-charcoal/88"
+                  <EditableDepoimentoField
+                    depoimentoId={dep.id}
+                    campo="texto"
+                    as="blockquote"
+                    className="mt-3 font-serif italic leading-[1.65] text-charcoal/88 w-full"
                     style={{ fontSize: "clamp(1.2rem,2.2vw,1.65rem)" }}
-                  >
-                    {dep.texto}
-                  </blockquote>
+                  />
 
                   {/* Linha dourada + assinatura */}
                   <div className="mt-8 flex items-center gap-4">
                     <div className="h-px w-10 bg-gold-soft/55" />
-                    <div>
-                      <p className="font-sans text-[0.82rem] font-medium uppercase tracking-[0.2em] text-charcoal/80">
-                        {dep.cliente}
-                      </p>
-                      <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mist/70">
-                        {dep.cidade}
-                      </p>
+                    <div className="w-full">
+                      <EditableDepoimentoField
+                        depoimentoId={dep.id}
+                        campo="cliente"
+                        as="p"
+                        className="font-sans text-[0.82rem] font-medium uppercase tracking-[0.2em] text-charcoal/80"
+                      />
+                      <EditableDepoimentoField
+                        depoimentoId={dep.id}
+                        campo="cidade"
+                        as="p"
+                        className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mist/70 mt-1"
+                      />
                     </div>
                   </div>
 
@@ -257,9 +289,9 @@ export function LuarExperiencias(): JSX.Element {
                 Fechar
               </button>
 
-              <img
-                src={`https://picsum.photos/seed/cliente-${modal.id}/1200/600`}
-                alt=""
+              <EditableDepoimentoImageField
+                depoimento={modal}
+                fallbackSrc={`https://picsum.photos/seed/cliente-${modal.id}/1200/600`}
                 className="h-56 w-full object-cover sm:h-72"
               />
 

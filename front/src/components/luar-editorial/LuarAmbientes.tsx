@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { IMAGES } from "./assets";
 import { easeEditorial } from "./motionPresets";
 import { useLoja } from "../../store/LojaContext";
+import { EditableSectionField } from "../ui/EditableSectionField";
+import { EditableImageField } from "../ui/EditableImageField";
 
 const ambientesFallback = [
   {
@@ -56,10 +58,14 @@ export function LuarAmbientes(): JSX.Element {
                 Atmosfera
               </p>
             </div>
-            <h2
+            <EditableSectionField
+              secaoIdentificador="atmosfera"
+              conteudoKey="titulo"
+              fallback="Ambientes que<br/><em class='font-light italic'>definem o espaço</em>"
+              as="h2"
               className="font-display font-medium leading-[1.08] text-charcoal"
               style={{ fontSize: "clamp(1.9rem,4vw,3rem)" }}
-              dangerouslySetInnerHTML={{ __html: conteudo.titulo || "Ambientes que<br/><em class=\"font-light italic\">definem o espaço</em>" }}
+              isHtml
             />
           </div>
           <p className="hidden font-sans text-[0.78rem] uppercase tracking-[0.24em] text-mist/60 md:block">
@@ -85,11 +91,12 @@ export function LuarAmbientes(): JSX.Element {
               >
                 {/* Imagem */}
                 <div className="absolute inset-0 overflow-hidden">
-                  <img
-                    src={amb.image || fallbackImg}
+                  <EditableImageField
+                    secaoIdentificador="atmosfera"
+                    conteudoKey={["ambientes", i, "image"]}
+                    fallbackSrc={fallbackImg}
                     alt={amb.title}
                     className="h-full w-full scale-100 object-cover transition duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
-                    loading="lazy"
                   />
                 </div>
 
@@ -100,40 +107,48 @@ export function LuarAmbientes(): JSX.Element {
 
                 {/* Número faint — topo direito */}
                 <div className="absolute right-5 top-5" aria-hidden>
-                  <span
-                    className="select-none font-display font-light leading-none text-cream/12 tabular-nums transition duration-700 group-hover:text-cream/20"
+                  <EditableSectionField
+                    secaoIdentificador="atmosfera"
+                    conteudoKey={["ambientes", i, "num"]}
+                    fallback={amb.num}
+                    as="span"
+                    className="select-none font-display font-light leading-none text-cream/12 transition duration-700 group-hover:text-cream/20"
                     style={{ fontSize: "clamp(3.5rem,6vw,5rem)" }}
-                  >
-                    {amb.num}
-                  </span>
+                  />
                 </div>
 
                 {/* Conteúdo inferior — sempre visível */}
                 <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7 md:p-8">
-                  <p
+                  <EditableSectionField
+                    secaoIdentificador="atmosfera"
+                    conteudoKey={["ambientes", i, "subtitle"]}
+                    fallback={amb.subtitle}
+                    as="p"
                     className="font-sans text-[0.8rem] font-medium uppercase tracking-[0.28em] text-gold-soft"
                     style={{ textShadow: shadowMid }}
-                  >
-                    {amb.subtitle}
-                  </p>
-                  <h3
+                  />
+                  <EditableSectionField
+                    secaoIdentificador="atmosfera"
+                    conteudoKey={["ambientes", i, "title"]}
+                    fallback={amb.title}
+                    as="h3"
                     className="mt-1.5 font-display font-medium leading-none text-cream"
                     style={{
                       fontSize: "clamp(2.2rem,4.5vw,3.8rem)",
                       textShadow: shadow,
                     }}
-                  >
-                    {amb.title}
-                  </h3>
+                  />
 
                   {/* Reveal no hover */}
                   <div className="mt-4 translate-y-4 opacity-0 transition duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">
-                    <p
+                    <EditableSectionField
+                      secaoIdentificador="atmosfera"
+                      conteudoKey={["ambientes", i, "hint"]}
+                      fallback={amb.hint}
+                      as="p"
                       className="max-w-[260px] font-sans text-[0.9rem] font-light leading-[1.72] text-stone-200/90"
                       style={{ textShadow: shadowMid }}
-                    >
-                      {amb.hint}
-                    </p>
+                    />
                     <div className="mt-5 inline-flex items-center gap-2.5 border-b border-gold-soft/50 pb-0.5">
                       <span className="font-sans text-[0.75rem] uppercase tracking-[0.24em] text-gold-soft">
                         Explorar

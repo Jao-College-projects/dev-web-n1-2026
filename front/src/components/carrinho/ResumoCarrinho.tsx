@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { useLoja } from "../../store/LojaContext";
 
 export function ResumoCarrinho(): JSX.Element {
   const { subtotalCarrinho, totalItensCarrinho, itensCarrinho } = useLoja();
+  const navigate = useNavigate();
 
   if (!itensCarrinho.length) return <></>;
 
@@ -48,6 +50,7 @@ export function ResumoCarrinho(): JSX.Element {
         {/* CTA */}
         <button
           type="button"
+          onClick={() => navigate("/finalizar")}
           className="group relative overflow-hidden border border-charcoal bg-charcoal px-12 py-4 font-sans text-[0.72rem] font-medium uppercase tracking-[0.3em] text-cream transition-all duration-700 hover:bg-charcoal/88"
         >
           <span className="relative z-10">Finalizar compra</span>

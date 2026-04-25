@@ -31,7 +31,7 @@ export function LuarProductStrip(): JSX.Element {
         {/* Brand stamp */}
         <div className="hidden items-center gap-3 md:flex">
           <p className="font-display text-[0.88rem] font-light italic tracking-wide text-charcoal/40">
-            Boutique · São Paulo
+            Boutique · Goiânia
           </p>
           <div className="h-px w-8 bg-gold-soft/40" />
         </div>

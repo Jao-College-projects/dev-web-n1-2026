@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import { useLoja } from "../store/LojaContext";
+import { EditableSectionField } from "../components/ui/EditableSectionField";
 
 const ease = { duration: 1.1, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] };
 
@@ -81,7 +82,7 @@ export function ProdutoDetalhePage(): JSX.Element {
 
         {/* Preço */}
         <div className="mt-8 border-t border-stone-200/60 pt-7">
-          <p className="font-display text-[2.2rem] font-medium text-charcoal">
+          <p className="font-price text-[2.2rem] font-medium text-charcoal">
             R$ {produto.preco.toLocaleString("pt-BR")}
           </p>
           <p className="mt-1 font-sans text-[0.72rem] text-mist/55">
@@ -109,10 +110,19 @@ export function ProdutoDetalhePage(): JSX.Element {
 
         {/* Trust badges */}
         <div className="mt-10 flex flex-wrap gap-5 border-t border-stone-100 pt-8">
-          {["Frete grátis SP", "Entrega cuidadosa", "Garantia 2 anos"].map((b) => (
-            <div key={b} className="flex items-center gap-2">
+          {[
+            { key: "badge_1", fallback: "Frete grátis GO" },
+            { key: "badge_2", fallback: "Entrega cuidadosa" },
+            { key: "badge_3", fallback: "Garantia 2 anos" }
+          ].map((b) => (
+            <div key={b.key} className="flex items-center gap-2">
               <div className="h-px w-4 bg-gold-soft/50" />
-              <span className="font-sans text-[0.65rem] uppercase tracking-[0.18em] text-mist/65">{b}</span>
+              <EditableSectionField
+                secaoIdentificador="produto_detalhe_global"
+                conteudoKey={b.key}
+                fallback={b.fallback}
+                className="font-sans text-[0.65rem] uppercase tracking-[0.18em] text-mist/65"
+              />
             </div>
           ))}
         </div>

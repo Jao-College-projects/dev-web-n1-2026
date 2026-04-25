@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { IMAGES } from "./assets";
 import { easeEditorial } from "./motionPresets";
 import { useLoja } from "../../store/LojaContext";
+import { EditableSectionField } from "../ui/EditableSectionField";
+import { EditableImageField } from "../ui/EditableImageField";
 
 const piecesFallback = [
   {
@@ -32,198 +34,318 @@ const piecesFallback = [
 ];
 
 function PieceBlock({
-  name,
-  verse,
-  image,
-  num,
-  className,
-  sizesClass,
+  name = "",
+  verse = "",
+  image = "",
+  num = "",
+  className = "",
+  sizesClass = "",
+  pieceIndex = 0,
+  onRemove,
 }: {
-  name: string;
-  verse: string;
-  image: string;
-  num: string;
+  name?: string;
+  verse?: string;
+  image?: string;
+  num?: string;
   className?: string;
   sizesClass?: string;
+  pieceIndex?: number;
+  onRemove?: (index: number) => void;
 }): JSX.Element {
+  // Fallbacks locais caso algo passe como nulo
+  const safeName = name || "Peça Luar";
+  const safeVerse = verse || "Design atemporal.";
+  const safeImage = image || "";
+  const safeNum = num || "I";
+
   return (
     <motion.figure
-      className={`group relative overflow-hidden ${className ?? ""}`}
-      initial={{ opacity: 0, y: 36 }}
+      className={`group relative overflow-hidden bg-stone-100 ${className}`}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-8%" }}
-      transition={easeEditorial}
+      viewport={{ once: true, margin: "-10%" }}
+      transition={{ ...easeEditorial, duration: 0.9 }}
     >
-      {/* Top gold line reveal */}
-      <div className="absolute inset-x-0 top-0 z-10 h-[2px] origin-left scale-x-0 bg-gold-soft/75 transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
+      <div className={`relative w-full overflow-hidden ${sizesClass || "min-h-[280px]"}`}>
+        {safeImage && (
+          <EditableImageField
+            secaoIdentificador="curadoria"
+            conteudoKey={["pieces", pieceIndex, "image"]}
+            fallbackSrc={safeImage}
+            alt={safeName}
+            className="h-full w-full object-cover transition duration-[1500ms] ease-out group-hover:scale-110 group-hover:rotate-1"
+            buttonPosition="top-right"
+          />
+        )}
 
-      <div className={`relative w-full overflow-hidden ${sizesClass ?? "min-h-[280px]"}`}>
-        <img
-          src={image}
-          alt={name}
-          className="h-full w-full object-cover transition duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
-          loading="lazy"
-        />
+        {/* Cinematic Overlays */}
+        <div className="pointer-events-none absolute inset-0 bg-stone-950/20 mix-blend-multiply opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/80 via-stone-950/20 to-transparent opacity-40 transition-opacity duration-700 group-hover:opacity-90" />
 
-        {/* Gradient overlay — always slightly present, stronger on hover */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/10 to-transparent opacity-60 transition duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100" />
-
-        {/* Faint roman numeral */}
-        <div className="absolute left-5 top-5" aria-hidden>
-          <span
-            className="select-none font-display font-light leading-none text-cream/12 transition duration-700 group-hover:text-cream/28"
-            style={{ fontSize: "clamp(2rem,3vw,3rem)" }}
-          >
-            {num}
-          </span>
+        {/* Piece Number (Roman) */}
+        <div className="absolute right-6 top-6 z-10 overflow-hidden" aria-hidden>
+          <EditableSectionField
+            secaoIdentificador="curadoria"
+            conteudoKey={["pieces", pieceIndex, "num"]}
+            fallback={safeNum}
+            as="span"
+            className="block select-none font-display text-[2.5rem] font-light leading-none text-white/10 transition-transform duration-1000 group-hover:-translate-y-2 group-hover:text-gold-soft/30"
+          />
         </div>
 
-        {/* Caption — always show name, verse reveals on hover */}
-        <figcaption className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 md:p-10">
-          {/* Name always visible */}
-          <div className="mb-0 h-px w-8 bg-gold-soft/60 transition duration-700 group-hover:w-14" />
-          <p
-            className="mt-3 font-display font-medium text-cream"
-            style={{ fontSize: "clamp(1.4rem,2.2vw,2rem)", textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}
-          >
-            {name}
-          </p>
-
-          {/* Verse + link reveal on hover */}
-          <div className="mt-3 translate-y-4 opacity-0 transition duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">
-            <p
-              className="max-w-[280px] font-sans font-light leading-[1.78] text-stone-200/85"
-              style={{ fontSize: "clamp(0.85rem,1.1vw,0.95rem)", textShadow: "0 1px 8px rgba(0,0,0,0.6)" }}
-            >
-              {verse}
-            </p>
-            <Link
-              to="/produtos"
-              className="mt-5 inline-flex items-center gap-2.5 border-b border-gold-soft/55 pb-0.5 font-sans text-[0.72rem] uppercase tracking-[0.28em] text-gold-soft transition-all duration-500 hover:text-cream hover:border-cream"
-            >
-              Ver peça
-              <svg className="stroke-current transition-transform duration-500 hover:translate-x-1" width="11" height="11" viewBox="0 0 12 12" fill="none">
-                <path d="M2 6h8M6 2l4 4-4 4" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
+        {/* Content Overlay */}
+        <figcaption className="absolute inset-0 z-20 flex flex-col justify-end p-8 md:p-12">
+          {/* Decorative bar */}
+          <div className="mb-4 h-px w-0 bg-gold-soft transition-all duration-700 group-hover:w-16" />
+          
+          <div className="translate-y-6 transition-transform duration-700 ease-out group-hover:translate-y-0">
+            <EditableSectionField
+              secaoIdentificador="curadoria"
+              conteudoKey={["pieces", pieceIndex, "name"]}
+              fallback={safeName}
+              as="h3"
+              className="font-display text-[1.8rem] font-medium leading-tight text-white md:text-[2.2rem]"
+              style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}
+            />
+            
+            <div className="mt-4 max-h-0 overflow-hidden opacity-0 transition-all duration-700 group-hover:max-h-32 group-hover:opacity-100">
+              <EditableSectionField
+                secaoIdentificador="curadoria"
+                conteudoKey={["pieces", pieceIndex, "verse"]}
+                fallback={safeVerse}
+                as="p"
+                className="max-w-[320px] font-sans text-[0.95rem] font-light leading-relaxed text-stone-200/90"
+              />
+              
+              <Link
+                to="/produtos"
+                className="mt-6 inline-flex items-center gap-3 text-[0.75rem] font-medium uppercase tracking-[0.3em] text-gold-soft transition-colors hover:text-white"
+              >
+                Explorar Obra
+                <svg className="w-4 h-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </div>
           </div>
         </figcaption>
+        {onRemove && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(pieceIndex);
+            }}
+            className="absolute left-4 top-4 z-[70] flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-transform hover:scale-110 active:scale-95"
+            title="Remover Peça"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+          </button>
+        )}
       </div>
     </motion.figure>
   );
 }
 
 export function LuarCurated(): JSX.Element {
-  const { secoesHome } = useLoja();
-  const curadoriaSecao = secoesHome.find(s => s.identificador === 'curadoria');
+  const { secoesHome, isAdmin, modoEdicao, atualizarSecaoHome } = useLoja();
+  const curadoriaSecao = secoesHome?.find(s => s.identificador === 'curadoria');
   const conteudo = curadoriaSecao?.conteudo || {};
 
-  const lista = conteudo.pieces?.length === 4 ? conteudo.pieces : piecesFallback;
+  const rawPieces = Array.isArray(conteudo.pieces) ? conteudo.pieces : piecesFallback;
+  
+  const getPiece = (index: number) => {
+    try {
+      const p = rawPieces[index] || {};
+      const d = (piecesFallback && piecesFallback[index]) ? piecesFallback[index] : (piecesFallback ? piecesFallback[0] : {});
+      
+      const safeStr = (val: any, fallback: string) => {
+        if (typeof val === 'string') return val;
+        if (val === null || val === undefined) return fallback;
+        return String(val);
+      };
+      
+      const pieceData = {
+        name: safeStr(p.name, d.name || ""),
+        verse: safeStr(p.verse, d.verse || ""),
+        image: safeStr(p.image, d.image || ""),
+        num: safeStr(p.num, d.num || "")
+      };
+      console.log(`DEBUG: Processada peça ${index}:`, pieceData);
+      return pieceData;
+    } catch (err) {
+      console.error("DEBUG: Erro ao processar peça:", index, err);
+      return { name: "Peça", verse: "", image: "", num: "I" };
+    }
+  };
 
-  // We assign fallback images directly here mapped over lista, just to be safe
-  const fallbackLista = lista.map((p: any, i: number) => ({
-    ...p,
-    image: p.image || piecesFallback[i].image
-  }));
+  const p0 = getPiece(0);
+  const p1 = getPiece(1);
+  const p2 = getPiece(2);
+  const p3 = getPiece(3);
+  const extras = rawPieces.length > 4 ? rawPieces.slice(4) : [];
 
-  const [featured, a, b, wide] = fallbackLista;
+  const handleAdicionarPeca = () => {
+    const novaPeca = {
+      name: "Nova Peça",
+      verse: "Descrição da nova obra selecionada.",
+      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=800",
+      num: (rawPieces.length + 1).toString()
+    };
+    
+    const newPieces = [...rawPieces, novaPeca];
+    atualizarSecaoHome('curadoria', {
+      ...curadoriaSecao!,
+      conteudo: { ...conteudo, pieces: newPieces }
+    });
+  };
+
+  const handleRemoverPeca = (index: number) => {
+    const newPieces = rawPieces.filter((_, i) => i !== index);
+    atualizarSecaoHome('curadoria', {
+      ...curadoriaSecao!,
+      conteudo: { ...conteudo, pieces: newPieces }
+    });
+  };
 
   return (
-    <section id="curadoria" className="bg-cream px-6 py-28 sm:px-10 md:py-40 lg:px-16">
+    <section id="curadoria" className="bg-cream px-6 py-28 sm:px-10 md:py-48 lg:px-16">
       <div className="mx-auto max-w-[1500px]">
 
-        {/* ── Section header ───────────────────────────────── */}
-        <motion.div
-          className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-12%" }}
-          transition={easeEditorial}
-        >
-          <div>
-            {/* Brand stamp */}
-            <div className="mb-4 flex items-center gap-3">
-              <div className="h-px w-8 bg-gold-soft/60" />
-              <p className="font-display text-[0.92rem] font-light italic tracking-[0.06em] text-gold-soft/80">
-                Boutique · São Paulo
-              </p>
+        {/* ── Editorial Header ─────────────────────────────── */}
+        <div className="relative mb-20 flex flex-col items-start gap-10 md:flex-row md:items-end md:justify-between lg:mb-28">
+          <motion.div
+            className="relative z-10 max-w-2xl"
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={easeEditorial}
+          >
+            <div className="mb-6 flex items-center gap-4">
+              <div className="h-px w-12 bg-gold-soft/50" />
+              <EditableSectionField
+                secaoIdentificador="curadoria"
+                conteudoKey="kicker"
+                fallback="Boutique · Goiânia"
+                className="font-display text-[1rem] font-light italic tracking-widest text-gold-soft/80"
+              />
             </div>
 
-            <div className="mb-5 flex items-center gap-3">
-              <span className="font-sans text-[0.82rem] uppercase tracking-[0.32em] text-mist">
-                Curadoria
-              </span>
-            </div>
+            <EditableSectionField
+              secaoIdentificador="curadoria"
+              conteudoKey="label"
+              fallback="Curadoria"
+              className="mb-8 block font-sans text-[0.8rem] uppercase tracking-[0.4em] text-mist/60"
+            />
 
             <h2
-              className="max-w-lg font-display font-medium leading-[1.1] text-charcoal"
-              style={{ fontSize: "clamp(2.2rem,4.8vw,3.8rem)" }}
+              className="font-display font-medium leading-[1.05] text-charcoal"
+              style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}
             >
-              <span dangerouslySetInnerHTML={{ __html: (conteudo.titulo_linha1 || "Peças escolhidas,") + "<br/><em class=\"font-light italic\">" + (conteudo.titulo_linha2 || "não exibidas em série.") + "</em>" }} />
+              <EditableSectionField
+                secaoIdentificador="curadoria"
+                conteudoKey="titulo_linha1"
+                fallback="Essência capturada"
+                as="span"
+              />
+              <br />
+              <EditableSectionField
+                secaoIdentificador="curadoria"
+                conteudoKey="titulo_linha2"
+                fallback="em cada detalhe."
+                as="em"
+                className="font-light italic text-stone-500"
+              />
             </h2>
-          </div>
+          </motion.div>
 
-          {/* Desktop CTA */}
-          <Link
-            to="/produtos"
-            className="group hidden items-center gap-3 border-b border-gold-soft/40 pb-1 font-sans text-[0.78rem] uppercase tracking-[0.28em] text-mist transition-all duration-500 hover:border-gold-soft hover:text-charcoal md:inline-flex"
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ ...easeEditorial, delay: 0.3 }}
           >
-            Ver coleção completa
-            <svg
-              className="stroke-current transition-transform duration-500 ease-editorial group-hover:translate-x-1"
-              width="13" height="13" viewBox="0 0 14 14" fill="none"
+            <Link
+              to="/produtos"
+              className="group flex flex-col items-end gap-2 text-right transition-all"
             >
-              <path d="M2 7h10M7 2l5 5-5 5" strokeWidth="1.15" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
-        </motion.div>
+              <span className="font-sans text-[0.7rem] uppercase tracking-[0.4em] text-mist group-hover:text-gold-soft">Descubra a coleção</span>
+              <div className="flex items-center gap-4">
+                <span className="font-display text-[1.1rem] italic text-charcoal">Ver todas as peças</span>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-200 transition-all group-hover:scale-110 group-hover:border-gold-soft group-hover:bg-gold-soft group-hover:text-white">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        </div>
 
-        {/* ── Gold divider ─────────────────────────────────── */}
-        <motion.div
-          className="mt-12 h-px w-full origin-left bg-gradient-to-r from-gold-soft/30 to-transparent"
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={{ once: true, margin: "-10%" }}
-          transition={{ ...easeEditorial, delay: 0.2 }}
-        />
-
-        {/* ── Main gallery grid ─────────────────────────────── */}
-        <div className="mt-16 flex flex-col gap-4 lg:mt-20 lg:flex-row lg:items-start lg:gap-5">
-          <PieceBlock
-            {...featured}
-            className="w-full lg:w-[55%] lg:max-w-[760px]"
-            sizesClass="min-h-[min(72vh,640px)] lg:min-h-[720px]"
-          />
-          <div className="flex w-full flex-col gap-4 lg:w-[45%]">
-            <PieceBlock {...a} className="w-full" sizesClass="min-h-[280px] md:min-h-[340px]" />
-            <PieceBlock {...b} className="w-full" sizesClass="min-h-[280px] md:min-h-[340px]" />
+        {/* ── Dynamic Layout ────────────────────────────────── */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {/* Main vertical piece */}
+          <div className="lg:col-span-7">
+            <PieceBlock
+              {...p0}
+              pieceIndex={0}
+              sizesClass="aspect-[4/5] lg:aspect-auto lg:h-[820px]"
+              onRemove={isAdmin && modoEdicao ? handleRemoverPeca : undefined}
+            />
           </div>
-        </div>
+ 
+          {/* Secondary stack */}
+          <div className="flex flex-col gap-6 lg:col-span-5">
+            <PieceBlock 
+              {...p1} 
+              pieceIndex={1} 
+              sizesClass="aspect-square lg:aspect-auto lg:h-[397px]" 
+              onRemove={isAdmin && modoEdicao ? handleRemoverPeca : undefined}
+            />
+            <PieceBlock 
+              {...p2} 
+              pieceIndex={2} 
+              sizesClass="aspect-square lg:aspect-auto lg:h-[397px]" 
+              onRemove={isAdmin && modoEdicao ? handleRemoverPeca : undefined}
+            />
+          </div>
+ 
+          {/* Wide final piece */}
+          <div className="lg:col-span-12">
+            <PieceBlock
+              {...p3}
+              pieceIndex={3}
+              sizesClass="aspect-[16/7] lg:h-[480px]"
+              onRemove={isAdmin && modoEdicao ? handleRemoverPeca : undefined}
+            />
+          </div>
+ 
+          {/* Extra pieces in a grid */}
+          {extras.map((piece, idx) => (
+            <div key={idx + 4} className="lg:col-span-4">
+              <PieceBlock
+                {...piece}
+                pieceIndex={idx + 4}
+                sizesClass="aspect-square lg:h-[400px]"
+                onRemove={isAdmin && modoEdicao ? handleRemoverPeca : undefined}
+              />
+            </div>
+          ))}
 
-        {/* ── Wide bottom piece ─────────────────────────────── */}
-        <div className="mt-4">
-          <PieceBlock
-            {...wide}
-            className="w-full"
-            sizesClass="min-h-[240px] md:min-h-[320px] lg:min-h-[400px]"
-          />
+          {/* ADD BUTTON */}
+          {isAdmin && modoEdicao && (
+            <div className="lg:col-span-4 flex items-center justify-center border-2 border-dashed border-stone-300 rounded-xl min-h-[400px] hover:border-gold-soft transition-colors group">
+              <button
+                onClick={handleAdicionarPeca}
+                className="flex flex-col items-center gap-4 text-stone-400 group-hover:text-gold-soft transition-colors"
+              >
+                <div className="h-16 w-16 rounded-full border-2 border-stone-300 flex items-center justify-center group-hover:border-gold-soft transition-colors">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </div>
+                <span className="font-sans text-[0.7rem] uppercase tracking-[0.2em] font-medium">Adicionar Peça à Curadoria</span>
+              </button>
+            </div>
+          )}
         </div>
-
-        {/* Mobile CTA */}
-        <motion.div
-          className="mt-12 flex justify-center md:hidden"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={easeEditorial}
-        >
-          <Link
-            to="/produtos"
-            className="inline-flex items-center gap-2 border-b border-gold-soft/45 pb-1 font-sans text-[0.78rem] uppercase tracking-[0.28em] text-mist"
-          >
-            Ver coleção completa
-          </Link>
-        </motion.div>
       </div>
     </section>
   );

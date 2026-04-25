@@ -96,7 +96,7 @@ export function LuarStory(): JSX.Element {
               />
               <figcaption className="mt-3 text-right">
                 <span className="font-sans text-[0.55rem] uppercase tracking-[0.3em] text-mist/55">
-                  Ateliê · São Paulo
+                  Ateliê · Goiânia
                 </span>
               </figcaption>
             </motion.figure>

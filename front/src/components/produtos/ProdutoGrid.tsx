@@ -3,9 +3,11 @@ import { ProdutoCard } from "./ProdutoCard";
 
 interface ProdutoGridProps {
   produtos: IProduto[];
+  onEdit?: (produto: IProduto) => void;
+  viewMode?: "grid" | "list";
 }
 
-export function ProdutoGrid({ produtos }: ProdutoGridProps): JSX.Element {
+export function ProdutoGrid({ produtos, onEdit, viewMode = "grid" }: ProdutoGridProps): JSX.Element {
   if (!produtos.length) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -18,9 +20,12 @@ export function ProdutoGrid({ produtos }: ProdutoGridProps): JSX.Element {
 
   return (
     <section aria-label="Catálogo de produtos">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div className={viewMode === "grid" 
+        ? "grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" 
+        : "flex flex-col gap-4"
+      }>
         {produtos.map((produto) => (
-          <ProdutoCard key={produto.id} produto={produto} />
+          <ProdutoCard key={produto.id} produto={produto} onEdit={onEdit} viewMode={viewMode} />
         ))}
       </div>
       <p className="mt-8 font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mist/50 text-right">

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap");
 
 /* Tokens: ui-ux-pro-max / design-system/luar-moveis/MASTER.md */
 :root {
@@ -42,6 +42,13 @@
   --hero-open-height: min(74vh, 42rem);
   --focus-ring: 0 0 0 3px rgba(28, 25, 23, 0.22);
   --focus-ring-cta: 0 0 0 3px rgba(202, 138, 4, 0.35);
+  --font-price: 'Montserrat', sans-serif;
+}
+
+.font-price {
+  font-family: var(--font-price);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
 *,
@@ -144,7 +151,13 @@ button,
 }
 
 .layout-main {
-  padding: 3.5rem 6vw 5rem;
+  padding: 4rem 6vw 5rem;
+}
+
+@media (max-width: 1024px) {
+  .layout-main {
+    padding-top: 10rem !important;
+  }
 }
 
 .home-main {
@@ -154,7 +167,7 @@ button,
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 100;
   background: var(--color-glass);
   backdrop-filter: blur(var(--blur-glass));
   -webkit-backdrop-filter: blur(var(--blur-glass));

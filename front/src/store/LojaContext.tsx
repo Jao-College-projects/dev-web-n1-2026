@@ -37,9 +37,10 @@ interface ILojaContextData {
   atualizarTextoSite: (chave: keyof ITextosSite, valor: string) => void;
   atualizarSecaoHome: (identificador: string, dados: ISecaoHome) => Promise<void>;
   alternarModoEdicao: () => void;
-  login: (dados: ICredenciaisLogin) => void;
-  cadastrar: (dados: IFormularioCadastro) => void;
-  logout: () => void;
+  isLoading: boolean;
+  login: (dados: ICredenciaisLogin) => Promise<void>;
+  cadastrar: (dados: IFormularioCadastro) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const LojaContext = createContext<ILojaContextData | undefined>(undefined);
@@ -62,45 +63,79 @@ export function LojaProvider({ children }: { children: React.ReactNode }): JSX.E
   const [itensCarrinho, setItensCarrinho] = useState<IItemCarrinho[]>([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState<IProduto | null>(null);
 
-  // Fake Auth para não quebrar a UI antes do Supabase Auth total:
   const [usuarioLogado, setUsuarioLogado] = useState<boolean>(false);
   const [tipoUsuario, setTipoUsuario] = useState<TipoUsuario>("normal");
   const [modoEdicao, setModoEdicao] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // FETCH SUPABASE DATA
+  // FETCH SUPABASE DATA E AUTH
   useEffect(() => {
-    async function loadData() {
-      const { data: prodData } = await supabase.from('produtos').select('*').order('id', { ascending: false });
-      if (prodData) {
-        setProdutos(prodData.map((p: any) => ({
-          id: p.id,
-          nome: p.nome,
-          categoria: p.categoria,
-          descricaoCurta: p.descricao_curta,
-          descricaoLonga: p.descricao_longa,
-          preco: Number(p.preco),
-          estoque: p.estoque,
-          imagem: p.imagem,
-          destaqueCarrossel: p.destaque_carrossel
-        })));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUsuarioLogado(!!session);
+      if (session?.user) {
+        fetchUserType(session.user.id);
       }
+    });
 
-      const { data: depoData } = await supabase.from('depoimentos').select('*').order('id', { ascending: false });
-      if (depoData) setDepoimentos(depoData);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUsuarioLogado(!!session);
+      if (session?.user) {
+        fetchUserType(session.user.id);
+      } else {
+        setTipoUsuario("normal");
+      }
+    });
 
-      const { data: homeData } = await supabase.from('secoes_home').select('*').eq('ativo', true);
-      if (homeData) {
-        setSecoesHome(homeData.map((s: any) => ({
-          identificador: s.identificador,
-          tituloSecao: s.titulo_secao,
-          ordem: s.ordem,
-          ativo: s.ativo,
-          conteudo: s.conteudo
-        })));
+    async function loadData() {
+      setIsLoading(true);
+      try {
+        const { data: prodData } = await supabase.from('produtos').select('*').order('id', { ascending: false });
+        if (prodData) {
+          setProdutos(prodData.map((p: any) => ({
+            id: p.id,
+            nome: p.nome,
+            categoria: p.categoria,
+            descricaoCurta: p.descricao_curta,
+            descricaoLonga: p.descricao_longa,
+            preco: Number(p.preco),
+            estoque: p.estoque,
+            imagem: p.imagem,
+            destaqueCarrossel: p.destaque_carrossel
+          })));
+        }
+
+        const { data: depoData } = await supabase.from('depoimentos').select('*').order('id', { ascending: false });
+        if (depoData) setDepoimentos(depoData);
+
+        const { data: homeData } = await supabase.from('secoes_home').select('*').eq('ativo', true);
+        if (homeData) {
+          setSecoesHome(homeData.map((s: any) => ({
+            identificador: s.identificador,
+            tituloSecao: s.titulo_secao,
+            ordem: s.ordem,
+            ativo: s.ativo,
+            conteudo: s.conteudo
+          })));
+        }
+      } finally {
+        setIsLoading(false);
       }
     }
     loadData();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
+
+  async function fetchUserType(userId: string) {
+    const { data } = await supabase.from('usuarios').select('tipo_usuario').eq('id', userId).maybeSingle();
+    if (data && data.tipo_usuario === 'admin') {
+      setTipoUsuario('admin');
+    } else {
+      setTipoUsuario('normal');
+    }
+  }
 
   function selecionarProduto(produto: IProduto): void {
     setProdutoSelecionado(produto);
@@ -203,13 +238,20 @@ export function LojaProvider({ children }: { children: React.ReactNode }): JSX.E
   }
 
   async function atualizarSecaoHome(identificador: string, novaSecao: ISecaoHome) {
-    const { error } = await supabase.from('secoes_home').update({
+    const { error } = await supabase.from('secoes_home').upsert({
+      identificador: identificador,
       titulo_secao: novaSecao.tituloSecao,
-      conteudo: novaSecao.conteudo
-    }).eq('identificador', identificador);
+      conteudo: novaSecao.conteudo,
+      ativo: novaSecao.ativo,
+      ordem: novaSecao.ordem
+    }, { onConflict: 'identificador' });
 
     if (!error) {
-      setSecoesHome(prev => prev.map(s => s.identificador === identificador ? novaSecao : s));
+      setSecoesHome(prev => {
+        const index = prev.findIndex(s => s.identificador === identificador);
+        if (index >= 0) return prev.map((s, i) => i === index ? novaSecao : s);
+        return [...prev, novaSecao];
+      });
     }
   }
 
@@ -223,17 +265,38 @@ export function LojaProvider({ children }: { children: React.ReactNode }): JSX.E
     setModoEdicao(prev => !prev);
   }
 
-  function login(dados: ICredenciaisLogin): void {
-    setTipoUsuario(dados.tipoUsuario);
-    setUsuarioLogado(true);
+  async function login(dados: ICredenciaisLogin): Promise<void> {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: dados.email,
+      password: dados.senha,
+    });
+    if (error) throw error;
   }
 
-  function cadastrar(_dados: IFormularioCadastro): void {
-    setTipoUsuario("normal");
-    setUsuarioLogado(true);
+  async function cadastrar(dados: IFormularioCadastro): Promise<void> {
+    const { data, error } = await supabase.auth.signUp({
+      email: dados.email,
+      password: dados.senha,
+      options: {
+        data: {
+          nomeCompleto: dados.nomeCompleto
+        }
+      }
+    });
+    if (error) throw error;
+
+    if (data.user) {
+      const { error: insertError } = await supabase.from('usuarios').insert([
+        { id: data.user.id, nome_completo: dados.nomeCompleto, email: dados.email, tipo_usuario: 'normal' }
+      ]);
+      if (insertError) {
+        console.warn("Aviso: Nao foi possivel inserir na tabela public.usuarios (Verifique RLS).", insertError);
+      }
+    }
   }
 
-  function logout(): void {
+  async function logout(): Promise<void> {
+    await supabase.auth.signOut();
     setUsuarioLogado(false);
     setTipoUsuario("normal");
     setModoEdicao(false);
@@ -281,6 +344,7 @@ export function LojaProvider({ children }: { children: React.ReactNode }): JSX.E
         atualizarTextoSite,
         atualizarSecaoHome,
         alternarModoEdicao,
+        isLoading,
         login,
         cadastrar,
         logout

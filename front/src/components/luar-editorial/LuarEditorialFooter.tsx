@@ -18,7 +18,7 @@ export function LuarEditorialFooter(): JSX.Element {
             </p>
             <p className="mt-5 max-w-[280px] font-sans text-[0.84rem] font-light leading-[1.82] text-stone-400/65">
               Curadoria boutique de móveis para ambientes clássicos, elegantes e atemporais.
-              São Paulo, Brasil.
+              Goiânia, Brasil.
             </p>
             <div className="mt-8 flex items-center gap-3">
               <div className="h-px w-8 bg-gold-soft/38" />
@@ -69,7 +69,7 @@ export function LuarEditorialFooter(): JSX.Element {
             </p>
             <div className="flex flex-col gap-3">
               <p className="font-sans text-[0.8rem] font-light leading-[1.75] text-stone-400/52">
-                São Paulo · SP
+                Goiânia · GO
                 <br />
                 Atendimento sob consulta
               </p>
@@ -89,7 +89,7 @@ export function LuarEditorialFooter(): JSX.Element {
             © {year} Luar Móveis · Todos os direitos reservados
           </p>
           <p className="font-sans text-[0.58rem] uppercase tracking-[0.2em] text-stone-600/35">
-            Design & Curadoria · São Paulo
+            Design & Curadoria · Goiânia
           </p>
         </div>
       </div>
