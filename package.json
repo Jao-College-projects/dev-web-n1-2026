@@ -1,0 +1,14 @@
+{
+  "name": "n1-trabalho-luar-moveis",
+  "version": "1.0.0",
+  "description": "Luar Móveis - E-commerce boutique de móveis de luxo",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix front",
+    "start": "npm run dev --prefix front",
+    "install:front": "npm install --prefix front",
+    "build:front": "npm run build --prefix front"
+  },
+  "author": "João Pedro",
+  "license": "ISC"
+}

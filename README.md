@@ -32,6 +32,21 @@ A aplicação foi estruturada seguindo o princípio de **Responsabilidade Única
 4. Semântica HTML5:
    - Uso rigoroso das tags `header`, `main`, `section`, `aside` e `address` para garantir acessibilidade e SEO.
 
+## 🚀 Como Rodar o Projeto
+
+Para facilitar a execução, o projeto possui scripts automatizados na raiz:
+
+1.  **Instalar dependências**:
+    ```bash
+    npm run install:front
+    ```
+
+2.  **Iniciar o site**:
+    ```bash
+    npm run dev
+    ```
+    *Isso iniciará o servidor de desenvolvimento e o site estará disponível em `http://localhost:5173`.*
+
 ## 👤 Identificação
 
 - **Aluno**: João Pedro
