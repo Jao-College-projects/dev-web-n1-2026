@@ -51,7 +51,7 @@ export function LuarProductStrip(): JSX.Element {
       <div className="overflow-hidden">
         <div
           className="flex w-max"
-          style={{ animation: "marquee 30s linear infinite" }}
+          style={{ animation: "marquee 30s linear infinite", willChange: "transform", transform: "translateZ(0)" }}
         >
           {strip.map((p, i) => (
             <Link

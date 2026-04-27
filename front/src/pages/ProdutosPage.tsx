@@ -11,7 +11,7 @@ import { EditableSectionField } from "../components/ui/EditableSectionField";
 const easeEd = { duration: 1.1, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] };
 
 export function ProdutosPage(): JSX.Element {
-  const { produtos, isAdmin } = useLoja();
+  const { produtos, isAdmin, totalItensCarrinho } = useLoja();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [produtoParaEditar, setProdutoParaEditar] = useState<IProduto | null>(null);
 
@@ -56,11 +56,14 @@ export function ProdutosPage(): JSX.Element {
     });
   }, [produtos, filtroCategoria, filtroPreco, filtroEstoque]);
 
-  const categoriasUnicas = new Set(produtosFiltrados.map((produto) => produto.categoria)).size;
-  const ticketMedio = produtosFiltrados.length
-    ? produtosFiltrados.reduce((soma, produto) => soma + produto.preco, 0) / produtosFiltrados.length
-    : 0;
-  const totalEstoque = produtosFiltrados.reduce((soma, p) => soma + p.estoque, 0);
+  // OPT-8: Derived stats memoized to avoid 3 full iterations on every render
+  const { categoriasUnicas, ticketMedio, totalEstoque } = useMemo(() => ({
+    categoriasUnicas: new Set(produtosFiltrados.map(p => p.categoria)).size,
+    ticketMedio: produtosFiltrados.length
+      ? produtosFiltrados.reduce((soma, p) => soma + p.preco, 0) / produtosFiltrados.length
+      : 0,
+    totalEstoque: produtosFiltrados.reduce((soma, p) => soma + p.estoque, 0),
+  }), [produtosFiltrados]);
 
   return (
     <div className="relative min-h-screen pb-20 container-fluid px-4 sm:px-6 lg:px-8">
@@ -112,11 +115,12 @@ export function ProdutosPage(): JSX.Element {
       </motion.div>
 
       {/* ── Dashboard de Contadores (Obrigatório) ─────────── */}
-      <DashboardStats 
+      <DashboardStats
         totalPecas={produtosFiltrados.length}
         totalCategorias={categoriasUnicas}
         ticketMedio={ticketMedio}
         totalEstoque={totalEstoque}
+        itensSacola={totalItensCarrinho}
       />
 
       {/* ── Conteúdo Principal Assimétrico (Bootstrap Grid) ─ */}

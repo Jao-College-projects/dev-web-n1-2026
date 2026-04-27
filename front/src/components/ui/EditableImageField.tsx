@@ -61,7 +61,8 @@ export function EditableImageField({
   showButton = true
 }: EditableImageFieldProps): JSX.Element {
   const { secoesHome, isAdmin, modoEdicao, atualizarSecaoHome } = useLoja();
-  const isPaginaAdmin = window.location.pathname.includes("/admin");
+  // useRef to avoid re-reading window.location on every render
+  const isPaginaAdmin = useRef(window.location.pathname.includes("/admin")).current;
   const exibirControles = isAdmin && (modoEdicao || isPaginaAdmin);
   
   const secao = secoesHome.find(s => s.identificador === secaoIdentificador);
@@ -111,7 +112,7 @@ export function EditableImageField({
     return (
       <div className={`relative group ${className ?? ""}`} style={style}>
         {!onlyButton && (
-          <img src={urlAtual || fallbackSrc} alt={alt} className={`w-full h-full object-cover transition-opacity ${carregando ? 'opacity-50' : ''}`} />
+          <img src={urlAtual || fallbackSrc} alt={alt} loading="lazy" className={`w-full h-full object-cover transition-opacity ${carregando ? 'opacity-50' : ''}`} />
         )}
         
         <input 
@@ -170,5 +171,5 @@ export function EditableImageField({
 
   if (onlyButton) return <></>;
 
-  return <img src={urlAtual || fallbackSrc} alt={alt} className={className} style={style} />;
+  return <img src={urlAtual || fallbackSrc} alt={alt} loading="lazy" className={className} style={style} />;
 }

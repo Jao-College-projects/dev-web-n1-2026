@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLoja } from "../../store/LojaContext";
 
@@ -8,7 +8,7 @@ interface CarouselMoveisProps {
   modo?: "card" | "background";
 }
 
-export function CarouselMoveis({ modo = "card" }: CarouselMoveisProps): JSX.Element {
+export const CarouselMoveis = memo(function CarouselMoveis({ modo = "card" }: CarouselMoveisProps): JSX.Element {
   const { produtos } = useLoja();
   const [indiceAtual, setIndiceAtual] = useState<number>(0);
 
@@ -62,4 +62,4 @@ export function CarouselMoveis({ modo = "card" }: CarouselMoveisProps): JSX.Elem
       </div>
     </div>
   );
-}
+});

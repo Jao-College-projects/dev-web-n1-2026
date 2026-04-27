@@ -16,6 +16,7 @@ export function ModalNovoProduto({ isOpen, onClose, produtoParaEditar }: ModalPr
   const [nome, setNome] = useState("");
   const [categoria, setCategoria] = useState("");
   const [preco, setPreco] = useState("");
+  const [estoque, setEstoque] = useState("10");
   const [descricao, setDescricao] = useState("");
   const [imagem, setImagem] = useState("");
   const [carregando, setCarregando] = useState(false);
@@ -27,12 +28,14 @@ export function ModalNovoProduto({ isOpen, onClose, produtoParaEditar }: ModalPr
       setNome(produtoParaEditar.nome);
       setCategoria(produtoParaEditar.categoria);
       setPreco(produtoParaEditar.preco.toString());
+      setEstoque(produtoParaEditar.estoque.toString());
       setDescricao(produtoParaEditar.descricaoLonga);
       setImagem(produtoParaEditar.imagem);
     } else {
       setNome("");
       setCategoria("");
       setPreco("");
+      setEstoque("10");
       setDescricao("");
       setImagem("");
     }
@@ -67,6 +70,7 @@ export function ModalNovoProduto({ isOpen, onClose, produtoParaEditar }: ModalPr
           nome,
           categoria,
           preco: Number(preco),
+          estoque: Math.max(0, Number(estoque)),
           descricaoCurta: descricao.substring(0, 100),
           descricaoLonga: descricao,
           imagem,
@@ -76,10 +80,10 @@ export function ModalNovoProduto({ isOpen, onClose, produtoParaEditar }: ModalPr
           nome,
           categoria,
           preco: Number(preco),
+          estoque: Math.max(0, Number(estoque)),
           descricaoCurta: descricao.substring(0, 100),
           descricaoLonga: descricao,
           imagem,
-          estoque: 10,
           destaqueCarrossel: false
         });
       }
@@ -139,15 +143,29 @@ export function ModalNovoProduto({ isOpen, onClose, produtoParaEditar }: ModalPr
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[0.65rem] uppercase tracking-widest text-mist">Preço (R$)</label>
-                <input
-                  type="number"
-                  className="field-input"
-                  value={preco}
-                  onChange={(e) => setPreco(e.target.value)}
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[0.65rem] uppercase tracking-widest text-mist">Preço (R$)</label>
+                  <input
+                    type="number"
+                    className="field-input"
+                    value={preco}
+                    onChange={(e) => setPreco(e.target.value)}
+                    required
+                    min="0"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[0.65rem] uppercase tracking-widest text-mist">Estoque (unid.)</label>
+                  <input
+                    type="number"
+                    className="field-input"
+                    value={estoque}
+                    onChange={(e) => setEstoque(e.target.value)}
+                    required
+                    min="0"
+                  />
+                </div>
               </div>
 
               <div className="space-y-1">

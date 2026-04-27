@@ -45,7 +45,7 @@ export function LuarManifesto(): JSX.Element {
             className="mb-8 inline-flex items-center gap-3"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ ...easeEditorial, duration: 0.8 }}
           >
             <div className="h-px w-8 bg-gold-soft/65" />
@@ -62,7 +62,7 @@ export function LuarManifesto(): JSX.Element {
             className="mb-6 flex items-center gap-3"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ ...easeEditorial, duration: 0.9, delay: 0.08 }}
           >
             <EditableSectionField
@@ -79,7 +79,7 @@ export function LuarManifesto(): JSX.Element {
             style={{ fontSize: "clamp(2.4rem,5.5vw,4.2rem)" }}
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={easeEditorial}
           >
             <EditableSectionField
@@ -96,7 +96,7 @@ export function LuarManifesto(): JSX.Element {
             className="mt-10 h-[1.5px] w-20 origin-left bg-gold-soft/60"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: "-12%" }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ ...easeEditorial, delay: 0.3 }}
           />
 
@@ -107,7 +107,7 @@ export function LuarManifesto(): JSX.Element {
               style={{ fontSize: "clamp(1rem,1.3vw,1.1rem)" }}
               initial={{ opacity: 0, y: 22 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-8%" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ ...easeEditorial, delay: 0.1 }}
             >
               <EditableSectionField
@@ -122,7 +122,7 @@ export function LuarManifesto(): JSX.Element {
               style={{ fontSize: "clamp(1rem,1.3vw,1.1rem)" }}
               initial={{ opacity: 0, y: 22 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-8%" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ ...easeEditorial, delay: 0.22 }}
             >
               <EditableSectionField
@@ -139,7 +139,7 @@ export function LuarManifesto(): JSX.Element {
             className="mt-14 border-l-[2px] border-gold-soft/55 pl-6"
             initial={{ opacity: 0, x: -16 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-8%" }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ ...easeEditorial, delay: 0.28 }}
           >
             <EditableSectionField
@@ -164,7 +164,7 @@ export function LuarManifesto(): JSX.Element {
         <div className="relative mx-auto min-h-[480px] w-full max-w-xl flex-1 lg:mx-0 lg:max-w-none lg:min-h-[600px]">
           {/* Back Image */}
           <motion.div
-            style={{ y: yBack }}
+            style={{ y: yBack, willChange: "transform" }}
             whileHover={{ zIndex: 20, scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="absolute -right-2 top-4 z-0 h-[50%] w-[56%] overflow-hidden rounded-[2px] shadow-[0_20px_50px_rgba(0,0,0,0.2)] transition-shadow duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.4)] sm:right-0 sm:top-8 sm:w-[50%]"
@@ -179,7 +179,7 @@ export function LuarManifesto(): JSX.Element {
 
           {/* Mid Image */}
           <motion.div
-            style={{ y: yMid }}
+            style={{ y: yMid, willChange: "transform" }}
             whileHover={{ zIndex: 20, scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="absolute left-0 top-[26%] z-[1] h-[44%] w-[48%] overflow-hidden rounded-[3px] shadow-[0_25px_60px_rgba(0,0,0,0.25)] transition-shadow duration-500 hover:shadow-[0_45px_90px_rgba(0,0,0,0.45)] sm:left-4 sm:w-[46%]"
@@ -194,7 +194,7 @@ export function LuarManifesto(): JSX.Element {
 
           {/* Front Image */}
           <motion.div
-            style={{ y: yFront }}
+            style={{ y: yFront, willChange: "transform" }}
             whileHover={{ zIndex: 20, scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="absolute bottom-2 right-0 z-[2] h-[48%] w-[60%] overflow-hidden rounded-[4px] shadow-[0_30px_70px_rgba(0,0,0,0.3)] transition-shadow duration-500 hover:shadow-[0_50px_100px_rgba(0,0,0,0.5)] sm:bottom-6 sm:right-4 sm:w-[58%]"

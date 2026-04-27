@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLoja } from "../../store/LojaContext";
 import { IProduto } from "../../types/IProduto";
@@ -10,14 +10,31 @@ interface ProdutoCardProps {
   viewMode?: "grid" | "list";
 }
 
-export function ProdutoCard({ produto, onEdit, viewMode = "grid" }: ProdutoCardProps): JSX.Element {
-  const { adicionarAoCarrinho, removerProduto, isAdmin, modoEdicao } = useLoja();
-  const [contextMenu, setContextMenu] = useState<{ x: number, y: number } | null>(null);
+export const ProdutoCard = memo(function ProdutoCard({ produto, onEdit, viewMode = "grid" }: ProdutoCardProps): JSX.Element {
+  const { adicionarAoCarrinho, removerProduto, isAdmin, modoEdicao, itensCarrinho } = useLoja();
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [alertaSemEstoque, setAlertaSemEstoque] = useState(false);
+
+  const semEstoque = produto.estoque <= 0;
+  const itemNoCarrinho = itensCarrinho.find(i => i.produtoId === produto.id);
 
   const handleAddCarrinho = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (semEstoque) {
+      setAlertaSemEstoque(true);
+      setTimeout(() => setAlertaSemEstoque(false), 2500);
+      return;
+    }
     adicionarAoCarrinho(produto.id);
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (semEstoque) {
+      e.preventDefault();
+      setAlertaSemEstoque(true);
+      setTimeout(() => setAlertaSemEstoque(false), 2500);
+    }
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -28,115 +45,167 @@ export function ProdutoCard({ produto, onEdit, viewMode = "grid" }: ProdutoCardP
     }
   };
 
+  const borderColor = semEstoque
+    ? "rgba(220, 38, 38, 0.5)"
+    : modoEdicao
+    ? "rgba(201,168,106,0.3)"
+    : itemNoCarrinho
+    ? "#c9a86a"
+    : "rgba(231,229,228,0.6)";
+
   return (
-    <div onContextMenu={handleContextMenu} className="relative">
+    <div onContextMenu={handleContextMenu} className="position-relative h-100">
+      {alertaSemEstoque && (
+        <div
+          className="position-absolute d-flex align-items-center justify-content-center"
+          style={{ inset: 0, zIndex: 50, pointerEvents: "none" }}
+        >
+          <div
+            className="font-sans fw-bold text-white text-center rounded-sm px-3 py-2"
+            style={{ background: "rgba(220,38,38,0.92)", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", boxShadow: "0 4px 20px rgba(0,0,0,0.25)", backdropFilter: "blur(4px)" }}
+          >
+            Não há produtos em estoque
+          </div>
+        </div>
+      )}
       <Link
         to={`/produtos/${produto.id}`}
-        className={`group relative flex ${viewMode === 'grid' ? 'flex-col' : 'flex-row items-center'} bg-white border ${modoEdicao ? 'border-gold-soft/30 hover:border-gold-soft/60' : 'border-stone-200/60'} overflow-hidden transition-all duration-500 ease-editorial hover:-translate-y-1 hover:shadow-[0_20px_48px_-12px_rgba(28,25,23,0.14)] no-underline`}
+        onClick={handleCardClick}
+        className={`produto-card d-flex border overflow-hidden h-100 ${viewMode === "grid" ? "flex-column" : "flex-row align-items-center"}`}
+        style={{ borderColor, background: semEstoque ? "rgba(254,242,242,0.7)" : "white" }}
       >
         {/* Imagem */}
-        <div className={`relative overflow-hidden ${viewMode === 'grid' ? 'aspect-[4/5]' : 'h-32 w-32 sm:h-44 sm:w-44 flex-shrink-0'}`}>
+        <div
+          className="overflow-hidden position-relative flex-shrink-0"
+          style={viewMode === "grid"
+            ? { aspectRatio: "4/5" }
+            : { height: "8rem", width: "8rem" }
+          }
+        >
           <img
             src={produto.imagem}
             alt={produto.nome}
-            className="h-full w-full object-cover transition duration-[1200ms] ease-editorial group-hover:scale-[1.04]"
+            className="produto-card-img"
             loading="lazy"
           />
 
-          {/* Overlay hover com ações */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/70 via-stone-950/10 to-transparent opacity-0 transition duration-700 group-hover:opacity-100" />
+          {/* Overlay hover */}
+          <div
+            className="position-absolute inset-0 transition-opacity-custom"
+            style={{ background: "linear-gradient(to top, rgba(28,25,23,0.7), rgba(28,25,23,0.1), transparent)", opacity: 0, pointerEvents: "none" }}
+          />
 
           {/* Categoria pill */}
-          <div className="absolute left-4 top-4">
-            <span className="bg-cream/92 px-3 py-1 font-sans text-[0.58rem] uppercase tracking-[0.22em] text-charcoal/80 backdrop-blur-sm">
+          <div className="position-absolute" style={{ top: "1rem", left: "1rem" }}>
+            <span
+              className="font-sans text-charcoal uppercase tracking-wide"
+              style={{ background: "rgba(247,244,239,0.92)", padding: "0.25rem 0.75rem", fontSize: "0.58rem", backdropFilter: "blur(4px)" }}
+            >
               {produto.categoria}
             </span>
           </div>
 
-          {/* Ações no hover (Somente no Grid) */}
-          {viewMode === 'grid' && (
-            <div className="absolute bottom-5 left-5 right-5 flex gap-2 translate-y-0 opacity-100 transition duration-[700ms] ease-editorial sm:translate-y-4 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
+          {/* Badge "Na sacola" */}
+          {itemNoCarrinho && (
+            <div
+              className="position-absolute d-flex align-items-center gap-1 rounded-pill bg-gold-soft px-2 py-1"
+              style={{ top: "0.75rem", right: "0.75rem", zIndex: 10 }}
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+              <span className="font-sans fw-bold uppercase text-white" style={{ fontSize: "0.55rem", letterSpacing: "0.1em" }}>
+                {itemNoCarrinho.quantidade}
+              </span>
+            </div>
+          )}
+
+          {/* Botão adicionar ao carrinho (grid mode) */}
+          {viewMode === "grid" && (
+            <div className="position-absolute bottom-0 start-0 end-0 p-3 d-flex gap-2">
               <button
                 type="button"
                 onClick={handleAddCarrinho}
-                disabled={produto.estoque <= 0}
-                className={`w-full py-2.5 font-sans uppercase tracking-[0.22em] text-charcoal transition shadow-md text-[0.6rem] ${
-                  produto.estoque <= 0 
-                    ? "bg-stone-300 cursor-not-allowed opacity-50" 
-                    : "bg-gold/90 hover:bg-gold-soft cursor-pointer"
-                }`}
+                className="w-100 py-2 font-sans uppercase tracking-wide transition-smooth"
+                style={{
+                  fontSize: "0.6rem",
+                  letterSpacing: "0.22em",
+                  border: "none",
+                  cursor: semEstoque ? "not-allowed" : "pointer",
+                  background: semEstoque ? "rgba(220,38,38,0.15)" : itemNoCarrinho ? "#c9a86a" : "rgba(184,149,108,0.9)",
+                  color: semEstoque ? "rgb(185,28,28)" : itemNoCarrinho ? "white" : "#1c1917",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
+                }}
               >
-                {produto.estoque <= 0 ? 'Indisponível' : '+ Carrinho'}
+                {semEstoque ? "Esgotado" : itemNoCarrinho ? `Na sacola (${itemNoCarrinho.quantidade})` : "+ Carrinho"}
               </button>
             </div>
           )}
 
-          {/* Status Esgotado Overlay */}
+          {/* Overlay esgotado */}
           {produto.estoque <= 0 && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-stone-900/40 backdrop-blur-[2px]">
-              <span className="bg-white px-4 py-2 font-sans text-[0.7rem] font-bold uppercase tracking-[0.3em] text-charcoal shadow-xl">
+            <div className="position-absolute inset-0 d-flex align-items-center justify-content-center" style={{ background: "rgba(28,25,23,0.4)", backdropFilter: "blur(2px)", zIndex: 20 }}>
+              <span className="bg-white font-sans fw-bold uppercase text-charcoal" style={{ padding: "0.5rem 1rem", fontSize: "0.7rem", letterSpacing: "0.3em", boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}>
                 Esgotado
               </span>
             </div>
           )}
         </div>
 
-        {/* Info */}
-        <div className={`flex flex-1 flex-col gap-3 ${viewMode === 'grid' ? 'p-5' : 'px-6 py-4'}`}>
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+        {/* Informações */}
+        <div className={`d-flex flex-column flex-grow-1 gap-3 ${viewMode === "grid" ? "p-4" : "px-4 py-3"}`}>
+          <div className={`d-flex ${viewMode === "list" ? "flex-sm-row align-items-sm-start justify-content-sm-between" : "flex-column"} gap-2`}>
             <div>
               <h3
-                className="font-display font-medium leading-tight text-charcoal"
-                style={{ fontSize: viewMode === 'grid' ? "clamp(1.05rem,1.6vw,1.3rem)" : "clamp(1.1rem,1.8vw,1.5rem)" }}
+                className="font-display fw-medium text-charcoal leading-tight mb-0"
+                style={{ fontSize: viewMode === "grid" ? "clamp(1.05rem,1.6vw,1.3rem)" : "clamp(1.1rem,1.8vw,1.5rem)" }}
               >
                 {produto.nome}
               </h3>
-              <p className={`mt-1.5 font-sans font-light leading-[1.65] text-mist ${viewMode === 'grid' ? 'text-[0.82rem] line-clamp-2' : 'text-[0.9rem] line-clamp-3 max-w-xl'}`}>
+              <p className={`mt-2 font-sans fw-light text-mist mb-0 ${viewMode === "grid" ? "line-clamp-2" : "line-clamp-3"}`} style={{ fontSize: viewMode === "grid" ? "0.82rem" : "0.9rem", lineHeight: 1.65 }}>
                 {produto.descricaoCurta}
               </p>
             </div>
-
-            {viewMode === 'list' && (
-              <p className="font-price text-[1.4rem] font-medium text-charcoal whitespace-nowrap">
+            {viewMode === "list" && (
+              <p className="font-price fw-medium text-charcoal whitespace-nowrap mb-0" style={{ fontSize: "1.4rem" }}>
                 R$ {produto.preco.toLocaleString("pt-BR")}
               </p>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="border border-stone-200 bg-stone-50 px-2 py-1 font-sans text-[0.58rem] uppercase tracking-[0.18em] text-mist/70">
+          <div className="d-flex align-items-center gap-2">
+            <span className="border border-stone-200 bg-stone-50 font-sans text-mist uppercase" style={{ padding: "0.25rem 0.5rem", fontSize: "0.58rem", letterSpacing: "0.18em", opacity: 0.7 }}>
               Entrega cuidada
             </span>
-            <span className="border border-gold-soft/45 bg-gold-soft/10 px-2 py-1 font-sans text-[0.58rem] uppercase tracking-[0.18em] text-charcoal/75">
+            <span className="font-sans text-charcoal uppercase" style={{ border: "1px solid rgba(201,168,106,0.45)", background: "rgba(201,168,106,0.1)", padding: "0.25rem 0.5rem", fontSize: "0.58rem", letterSpacing: "0.18em", opacity: 0.75 }}>
               Curadoria
             </span>
           </div>
 
-          <div className={`flex items-center justify-between border-t border-stone-100 pt-3 ${viewMode === 'list' ? 'mt-auto' : ''}`}>
-            {viewMode === 'grid' && (
-              <p className="font-price text-[1.15rem] font-medium text-charcoal">
+          <div className={`d-flex align-items-center justify-content-between border-top border-stone-100 pt-3 ${viewMode === "list" ? "mt-auto" : ""}`}>
+            {viewMode === "grid" && (
+              <p className="font-price fw-medium text-charcoal mb-0" style={{ fontSize: "1.15rem" }}>
                 R$ {produto.preco.toLocaleString("pt-BR")}
               </p>
             )}
-            
-            <div className="flex items-center gap-6">
-              {viewMode === 'list' && (
+            <div className="d-flex align-items-center gap-4">
+              {viewMode === "list" && (
                 <button
                   type="button"
                   onClick={handleAddCarrinho}
-                  disabled={produto.estoque <= 0}
-                  className={`font-sans text-[0.6rem] uppercase tracking-[0.22em] transition-colors ${
-                    produto.estoque <= 0 
-                      ? "text-stone-300 cursor-not-allowed" 
-                      : "text-gold-dark hover:text-gold-soft cursor-pointer"
-                  }`}
+                  className="border-0 bg-transparent p-0 font-sans uppercase tracking-wide transition-colors-custom"
+                  style={{
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.22em",
+                    color: semEstoque ? "rgb(185,28,28)" : itemNoCarrinho ? "#c9a86a" : "#8a6535",
+                    cursor: semEstoque ? "not-allowed" : "pointer",
+                    fontWeight: itemNoCarrinho ? 700 : 400
+                  }}
                 >
-                  {produto.estoque <= 0 ? 'Indisponível' : '+ Carrinho'}
+                  {semEstoque ? "Esgotado" : itemNoCarrinho ? `Na sacola (${itemNoCarrinho.quantidade})` : "+ Carrinho"}
                 </button>
               )}
-              <span className="group/link inline-flex items-center gap-1.5 font-sans text-[0.6rem] uppercase tracking-[0.22em] text-mist transition-colors duration-300 group-hover:text-charcoal cursor-pointer">
+              <span className="d-inline-flex align-items-center gap-2 font-sans text-mist uppercase tracking-wide transition-colors-custom" style={{ fontSize: "0.6rem", letterSpacing: "0.22em", cursor: "pointer" }}>
                 Ver página
-                <svg className="stroke-current transition-transform duration-300 group-hover:translate-x-0.5" width="10" height="10" viewBox="0 0 12 12" fill="none">
+                <svg className="stroke-current" width="10" height="10" viewBox="0 0 12 12" fill="none">
                   <path d="M2 6h8M6 2l4 4-4 4" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
@@ -156,4 +225,4 @@ export function ProdutoCard({ produto, onEdit, viewMode = "grid" }: ProdutoCardP
       )}
     </div>
   );
-}
+});

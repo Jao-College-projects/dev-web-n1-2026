@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ClassicLayout } from "../components/layout/ClassicLayout";
-import { CadastroPage } from "../pages/CadastroPage";
 import { AdminPage } from "../pages/AdminPage";
 import { CarrinhoPage } from "../pages/CarrinhoPage";
 import { AuthPage } from "../pages/AuthPage";

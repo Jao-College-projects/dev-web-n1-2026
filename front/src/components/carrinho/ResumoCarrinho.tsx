@@ -8,54 +8,46 @@ export function ResumoCarrinho(): JSX.Element {
   if (!itensCarrinho.length) return <></>;
 
   return (
-    <div className="border-t border-stone-200/70 bg-stone-50/80 px-[6vw] py-8">
-      {/* Trust badges */}
-      <div className="mb-6 flex flex-wrap items-center gap-6">
+    <div className="bg-stone-50/80 border border-stone-200/70 p-8">
+      <h2 className="font-display text-[1.1rem] text-charcoal mb-6">Resumo do Pedido</h2>
+
+      <div className="mb-6 h-px w-full bg-gradient-to-r from-gold-soft/40 via-gold-soft/20 to-transparent" />
+
+      <div className="d-flex flex-column gap-3 mb-4">
+        <div className="d-flex justify-content-between align-items-center">
+          <p className="font-sans text-[0.62rem] uppercase tracking-[0.24em] text-mist/60 mb-0">Itens</p>
+          <p className="font-sans text-[0.88rem] text-charcoal mb-0">
+            {totalItensCarrinho} {totalItensCarrinho === 1 ? "peça" : "peças"}
+          </p>
+        </div>
+        <div className="d-flex justify-content-between align-items-center">
+          <p className="font-sans text-[0.62rem] uppercase tracking-[0.24em] text-mist/60 mb-0">Entrega</p>
+          <p className="font-sans text-[0.88rem] text-green-700 mb-0">Grátis</p>
+        </div>
+        <div className="d-flex justify-content-between align-items-end border-t border-stone-100 pt-3">
+          <p className="font-sans text-[0.8rem] uppercase tracking-widest text-charcoal font-bold mb-0">Total</p>
+          <p className="font-display font-medium text-charcoal mb-0" style={{ fontSize: "clamp(1.5rem,2.5vw,2rem)" }}>
+            R$ {subtotalCarrinho.toLocaleString("pt-BR")}
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => navigate("/finalizar")}
+        className="group relative overflow-hidden w-full border border-charcoal bg-charcoal px-8 py-4 font-sans text-[0.72rem] font-medium uppercase tracking-[0.3em] text-cream transition-all duration-700 hover:bg-charcoal/88 mt-4"
+      >
+        <span className="relative z-10">Finalizar compra</span>
+        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/8 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+      </button>
+
+      <div className="mt-6 d-flex flex-column gap-2">
         {["Pagamento seguro", "Entrega cuidadosa", "Garantia 2 anos"].map((item) => (
-          <div key={item} className="flex items-center gap-2">
+          <div key={item} className="d-flex align-items-center gap-2">
             <div className="h-px w-4 bg-gold-soft/60" />
             <span className="font-sans text-[0.6rem] uppercase tracking-[0.2em] text-mist/60">{item}</span>
           </div>
         ))}
-      </div>
-
-      {/* Linha dourada */}
-      <div className="mb-6 h-px w-full bg-gradient-to-r from-gold-soft/40 via-gold-soft/20 to-transparent" />
-
-      {/* Barra de resumo */}
-      <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-        {/* Valores */}
-        <div className="flex flex-wrap items-center gap-8">
-          <div>
-            <p className="font-sans text-[0.62rem] uppercase tracking-[0.24em] text-mist/60">Itens</p>
-            <p className="mt-0.5 font-sans text-[0.88rem] text-charcoal">
-              {totalItensCarrinho} {totalItensCarrinho === 1 ? "peça" : "peças"}
-            </p>
-          </div>
-          <div>
-            <p className="font-sans text-[0.62rem] uppercase tracking-[0.24em] text-mist/60">Entrega</p>
-            <p className="mt-0.5 font-sans text-[0.88rem] text-green-700">Grátis</p>
-          </div>
-          <div>
-            <p className="font-sans text-[0.62rem] uppercase tracking-[0.24em] text-mist/60">Total</p>
-            <p
-              className="mt-0.5 font-display font-medium text-charcoal"
-              style={{ fontSize: "clamp(1.5rem,2.5vw,2rem)" }}
-            >
-              R$ {subtotalCarrinho.toLocaleString("pt-BR")}
-            </p>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <button
-          type="button"
-          onClick={() => navigate("/finalizar")}
-          className="group relative overflow-hidden border border-charcoal bg-charcoal px-12 py-4 font-sans text-[0.72rem] font-medium uppercase tracking-[0.3em] text-cream transition-all duration-700 hover:bg-charcoal/88"
-        >
-          <span className="relative z-10">Finalizar compra</span>
-          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/8 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-        </button>
       </div>
     </div>
   );

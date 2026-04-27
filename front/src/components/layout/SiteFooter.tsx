@@ -2,70 +2,65 @@ import { Link } from "react-router-dom";
 
 export function SiteFooter(): JSX.Element {
   return (
-    <footer className="mt-24 border-t border-stone-200/10 bg-charcoal px-6 py-20 sm:px-10 lg:px-16 text-cream">
-      <div className="mx-auto max-w-[1400px]">
-        
-        {/* Top Section: Brand & Tagline */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-b border-stone-800/40 pb-16">
-          <div className="md:col-span-5">
-            <h2 className="font-display text-[1.8rem] font-light italic tracking-tight text-white mb-6">
+    <footer className="footer-shell text-cream">
+      <div className="container">
+
+        {/* Topo: marca + navegação */}
+        <div className="row g-4 g-md-5 border-bottom pb-5 mb-5" style={{ borderColor: "rgba(41,37,36,0.4)" }}>
+          <div className="col-12 col-md-5">
+            <h2 className="font-display fw-light fst-italic text-white mb-4" style={{ fontSize: "1.8rem" }}>
               Luar Móveis
             </h2>
-            <p className="font-sans text-[0.85rem] leading-relaxed text-stone-400 max-w-sm">
-              Curadoria boutique de móveis para ambientes clássicos, elegantes e atemporais. 
+            <p className="font-sans text-stone-400 leading-relaxed" style={{ fontSize: "0.85rem", maxWidth: "24rem" }}>
+              Curadoria boutique de móveis para ambientes clássicos, elegantes e atemporais.
               <br /><span className="text-stone-500">Goiânia, Goiás.</span>
             </p>
-            <div className="mt-10 flex items-center gap-6">
-              <span className="font-sans text-[0.62rem] uppercase tracking-[0.3em] text-gold-soft/60">Desde 2013</span>
-              <Link to="/produtos" className="group flex items-center gap-3">
-                <span className="font-sans text-[0.65rem] uppercase tracking-[0.25em] text-white group-hover:text-gold-soft transition-colors">Navegar</span>
-                <div className="h-px w-8 bg-stone-700 group-hover:w-12 group-hover:bg-gold-soft transition-all duration-500" />
+            <div className="d-flex align-items-center gap-4 mt-4">
+              <span className="font-sans text-gold-soft uppercase tracking-widest" style={{ fontSize: "0.62rem", opacity: 0.6 }}>Desde 2013</span>
+              <Link to="/produtos" className="d-flex align-items-center gap-3 text-decoration-none transition-colors-custom hover-gold">
+                <span className="font-sans text-white uppercase tracking-widest" style={{ fontSize: "0.65rem" }}>Navegar</span>
+                <div className="flex-shrink-0" style={{ height: "1px", width: "2rem", background: "#44403c" }} />
               </Link>
             </div>
           </div>
 
-          {/* Navigation Columns */}
-          <div className="md:col-span-3">
-            <h3 className="font-sans text-[0.65rem] uppercase tracking-[0.25em] text-gold-soft mb-8">Menu</h3>
-            <nav className="flex flex-col gap-4 font-sans text-[0.75rem] text-stone-400 uppercase tracking-widest">
-              <Link to="/produtos" className="hover:text-white transition-colors">Coleção</Link>
-              <Link to="/#ambientes" className="hover:text-white transition-colors">Ambientes</Link>
-              <Link to="/auth" className="hover:text-white transition-colors">Conta</Link>
+          <div className="col-12 col-md-3">
+            <h3 className="font-sans text-gold-soft uppercase mb-4" style={{ fontSize: "0.65rem", letterSpacing: "0.25em" }}>Menu</h3>
+            <nav className="d-flex flex-column gap-3 font-sans text-stone-400 uppercase tracking-wider" style={{ fontSize: "0.75rem" }}>
+              <Link to="/produtos" className="text-decoration-none transition-colors-custom hover-gold">Coleção</Link>
+              <Link to="/#ambientes" className="text-decoration-none transition-colors-custom hover-gold">Ambientes</Link>
+              <Link to="/auth" className="text-decoration-none transition-colors-custom hover-gold">Conta</Link>
             </nav>
           </div>
 
-          {/* Contact Column */}
-          <div className="md:col-span-4">
-            <h3 className="font-sans text-[0.65rem] uppercase tracking-[0.25em] text-gold-soft mb-8">Contato</h3>
-            <div className="flex flex-col gap-6">
+          <div className="col-12 col-md-4">
+            <h3 className="font-sans text-gold-soft uppercase mb-4" style={{ fontSize: "0.65rem", letterSpacing: "0.25em" }}>Contato</h3>
+            <div className="d-flex flex-column gap-4">
               <div>
-                <p className="font-sans text-[0.75rem] text-white uppercase tracking-widest">Goiânia · GO</p>
-                <p className="font-sans text-[0.7rem] text-stone-500 uppercase tracking-wider mt-1">Atendimento sob consulta</p>
+                <p className="font-sans text-white uppercase tracking-wider mb-1" style={{ fontSize: "0.75rem" }}>Goiânia · GO</p>
+                <p className="font-sans text-stone-500 uppercase tracking-wide" style={{ fontSize: "0.7rem" }}>Atendimento sob consulta</p>
               </div>
-              <a href="mailto:contato@luarmoveis.com.br" className="font-sans text-[0.75rem] text-stone-400 hover:text-white transition-colors underline underline-offset-8 decoration-stone-800">
+              <a href="mailto:contato@luarmoveis.com.br" className="font-sans text-stone-400 text-decoration-underline transition-colors-custom hover-gold" style={{ fontSize: "0.75rem" }}>
                 contato@luarmoveis.com.br
               </a>
             </div>
           </div>
         </div>
 
-        {/* Bottom Section: Copyright & Academic Info */}
-        <div className="mt-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
-          <div className="flex flex-col gap-2">
-            <p className="font-sans text-[0.6rem] uppercase tracking-[0.25em] text-stone-600">
-              © {new Date().getFullYear()} LUAR MÓVEIS · TODOS OS DIREITOS RESERVADOS
-            </p>
-          </div>
+        {/* Rodapé inferior: copyright + identificação */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-4">
+          <p className="font-sans uppercase tracking-widest text-stone-600 mb-0" style={{ fontSize: "0.6rem" }}>
+            © {new Date().getFullYear()} LUAR MÓVEIS · TODOS OS DIREITOS RESERVADOS
+          </p>
 
-          {/* Informações Obrigatórias - Prof. Fernando (Tag Address Obrigatória) */}
-          <address className="not-italic text-left md:text-right">
-            <p className="font-sans text-[0.58rem] text-stone-600 uppercase tracking-[0.2em] leading-loose">
-              Desenvolvido por: <span className="text-stone-400">João Pedro</span><br />
-              Disciplina: Desenvolvimento Web · <span className="text-stone-400">Prof. Fernando</span><br />
-              Data: {new Date().toLocaleDateString('pt-BR')}
-            </p>
+          {/* Tag obrigatória pelo professor */}
+          <address className="font-sans text-stone-600 mb-0" style={{ fontStyle: "normal", fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.2em", lineHeight: 2 }}>
+            Desenvolvido por: <span className="text-stone-400">João Pedro</span><br />
+            Disciplina: Desenvolvimento Web · <span className="text-stone-400">Prof. Fernando</span><br />
+            Data: {new Date().toLocaleDateString("pt-BR")}
           </address>
         </div>
+
       </div>
     </footer>
   );

@@ -47,7 +47,7 @@ export function EditorialLayers(): JSX.Element {
             >
               <Link to={`/produtos/${produto.id}`} className="curadoria-link">
                 <div className="curadoria-image-wrap">
-                  <img src={produto.imagem} alt={produto.nome} className="curadoria-image" />
+                  <img src={produto.imagem} alt={produto.nome} className="curadoria-image" loading="lazy" />
                   <span className="curadoria-shine" />
                 </div>
                 <div className="curadoria-caption">
@@ -75,7 +75,7 @@ export function EditorialLayers(): JSX.Element {
               className={`ambiente-card ambiente-card--motion editorial-reveal editorial-reveal--delay-${Math.min(i + 1, 4)}`}
             >
               <div className="ambiente-image-wrap">
-                <img src={ambiente.imagem} alt="" className="ambiente-image" />
+                <img src={ambiente.imagem} alt="" className="ambiente-image" loading="lazy" />
                 <span className="ambiente-parallax-shade" />
               </div>
               <div className="ambiente-caption">

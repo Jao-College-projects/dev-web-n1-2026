@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useLoja } from "../store/LojaContext";
 import { EditableImageField } from "../components/ui/EditableImageField";
@@ -28,6 +28,14 @@ export function AdminPage(): JSX.Element {
   const [novoDepoimentoTexto, setNovoDepoimentoTexto] = useState<string>("");
   const [novoDepoimentoCidade, setNovoDepoimentoCidade] = useState<string>("");
   const [novoDepoimentoImagem, setNovoDepoimentoImagem] = useState<string>("");
+
+  useEffect(() => {
+    const urls: string[] = [
+      ...produtos.map(p => p.imagem),
+      ...depoimentos.map(d => d.imagem).filter(Boolean) as string[],
+    ];
+    urls.forEach(url => { if (url) { new Image().src = url; } });
+  }, [produtos, depoimentos]);
 
   if (!isAdmin) {
     return <Navigate to="/" replace />;
@@ -233,8 +241,15 @@ export function AdminPage(): JSX.Element {
             <article className="lux-panel p-3" key={produto.id}>
               <div className="grid grid-cols-12 gap-4 items-center">
                 <div className="col-span-12 md:col-span-2">
-                  <div className="relative group aspect-square rounded overflow-hidden border border-stone-200 shadow-sm">
-                    <img src={produto.imagem} alt={produto.nome} className="h-full w-full object-cover" />
+                  <div className="relative group aspect-square rounded overflow-hidden border border-stone-200 shadow-sm bg-stone-100">
+                    <img
+                      src={produto.imagem}
+                      alt={produto.nome}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-opacity duration-300"
+                      style={{ opacity: 0 }}
+                      onLoad={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "1"; }}
+                    />
                     <input 
                       type="file" 
                       className="hidden" 
@@ -275,7 +290,7 @@ export function AdminPage(): JSX.Element {
                     }
                   />
                 </div>
-                <div className="col-span-12 md:col-span-2">
+                <div className="col-span-12 md:col-span-1">
                   <input
                     className="field-input"
                     type="number"
@@ -283,6 +298,21 @@ export function AdminPage(): JSX.Element {
                     onChange={(evento) =>
                       atualizarProduto({ ...produto, preco: Number(evento.target.value) })
                     }
+                    min="0"
+                    title="Preço"
+                  />
+                </div>
+                <div className="col-span-12 md:col-span-1">
+                  <input
+                    className="field-input"
+                    type="number"
+                    value={produto.estoque}
+                    onChange={(evento) =>
+                      atualizarProduto({ ...produto, estoque: Math.max(0, Number(evento.target.value)) })
+                    }
+                    min="0"
+                    title="Estoque"
+                    style={{ borderColor: produto.estoque <= 0 ? "rgba(220,38,38,0.5)" : undefined }}
                   />
                 </div>
                 <div className="col-span-12 md:col-span-2 flex items-center gap-2">
@@ -395,12 +425,21 @@ export function AdminPage(): JSX.Element {
             <article className="lux-panel p-3" key={depoimento.id}>
               <div className="grid grid-cols-12 gap-3 items-center">
                 <div className="col-span-12 md:col-span-2">
-                  <div className="relative group aspect-square rounded overflow-hidden border border-stone-200 shadow-sm">
-                    <img 
-                      src={depoimento.imagem || `https://picsum.photos/seed/cliente-${depoimento.id}/200/200`} 
-                      alt={depoimento.cliente} 
-                      className="h-full w-full object-cover" 
-                    />
+                  <div className="relative group aspect-square rounded overflow-hidden border border-stone-200 shadow-sm bg-stone-100">
+                    {depoimento.imagem ? (
+                      <img
+                        src={depoimento.imagem}
+                        alt={depoimento.cliente}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-opacity duration-300"
+                        style={{ opacity: 0 }}
+                        onLoad={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "1"; }}
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center">
+                        <span className="font-display text-stone-400 text-2xl">{depoimento.cliente.charAt(0)}</span>
+                      </div>
+                    )}
                     <input 
                       type="file" 
                       className="hidden" 

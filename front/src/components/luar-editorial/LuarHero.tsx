@@ -86,12 +86,11 @@ export function LuarHero(): JSX.Element {
         </div>
       )}
 
-      {/* Gradientes cinematográficos aprimorados */}
+      {/* Gradiente cinematográfico ultra-sutil apenas para legibilidade do texto */}
       <div className="pointer-events-none absolute inset-0 z-[1]" aria-hidden>
-        {/* Overlay lateral mais denso para legibilidade do texto */}
-        <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-stone-950/95 via-stone-950/60 to-transparent" />
-        {/* Gradiente inferior para destacar o carrossel de produtos */}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-transparent to-stone-950/20" />
+        {/* Overlay lateral muito sutil */}
+        <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-stone-950/30 via-stone-950/5 to-transparent" />
+        {/* Sem gradiente inferior para evitar efeito de corte */}
       </div>
 
 
@@ -198,19 +197,18 @@ export function LuarHero(): JSX.Element {
 
         {strip.length > 0 && (
           <motion.div
-            className="mx-auto mb-8 w-full overflow-hidden"
-            style={{ 
-              maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
-              WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)'
-            }}
+            className="mx-auto mb-4 w-full"
+            style={{ overflow: "visible", position: "relative" }}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...easeEditorial, delay: 1.4 }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Itens deslizantes — Agora totalmente flutuantes e sem fundo */}
-            <div className="px-6 py-12 cursor-grab active:cursor-grabbing">
+            {/* Removidos os fades laterais para evitar barras verticais e efeito de corte */}
+
+            {/* Itens deslizantes — Padding maior para não cortar a sombra */}
+            <div className="px-6 py-4 pb-20 cursor-grab active:cursor-grabbing" style={{ overflow: "visible" }}>
               <motion.div
                 className="flex w-max gap-4"
                 style={{ x }}
@@ -223,31 +221,34 @@ export function LuarHero(): JSX.Element {
                 {strip.map((p, i) => (
                   <motion.div
                     key={i}
-                    whileHover={{ scale: 1.15, zIndex: 50 }}
+                    whileHover={{ scale: 1.12, zIndex: 50 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     className="relative flex-shrink-0"
-                    style={{ width: "clamp(130px, 11vw, 170px)" }}
+                    style={{ width: "clamp(130px, 11vw, 170px)", transformOrigin: "bottom center" }}
                   >
                     <Link
                       to={`/produtos/${p.id}`}
-                      className="group relative block w-full rounded-lg border border-white/10 no-underline transition-shadow duration-500 hover:shadow-[0_25px_60px_rgba(0,0,0,0.6)]"
+                      className="group relative block w-full no-underline transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
                       onClick={(e) => {
                         if (e.defaultPrevented) return;
                       }}
                     >
-                    <div className="relative overflow-hidden rounded-lg bg-black/10 backdrop-blur-sm">
+                    {/* Moldura com efeito glass ultra-fino */}
+                    <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-[8px] transition-all duration-500 group-hover:bg-white/[0.08] group-hover:border-white/[0.15]">
                       <div className="absolute inset-x-0 top-0 z-10 h-[1.5px] origin-left scale-x-0 bg-gold-soft transition duration-500 group-hover:scale-x-100" />
-                      <div className="overflow-hidden rounded-t-lg" style={{ height: "clamp(90px, 8vw, 120px)" }}>
+                      
+                      <div className="overflow-hidden rounded-t-xl" style={{ height: "clamp(90px, 8vw, 120px)" }}>
                         <img
                           src={p.imagem}
                           alt={p.nome}
-                          className="h-full w-full object-cover grayscale-[0.2] transition duration-700 group-hover:scale-110 group-hover:grayscale-0"
+                          className="h-full w-full object-cover grayscale-[0.1] transition duration-700 group-hover:scale-110 group-hover:grayscale-0"
                           loading="lazy"
                           draggable={false}
                         />
                       </div>
-                      <div className="px-3 py-3 border-t border-white/5">
-                        <p className="truncate font-sans text-[0.6rem] uppercase tracking-[0.1em] text-white leading-tight">
+                      
+                      <div className="px-3 py-3 border-t border-white/[0.05] bg-black/10">
+                        <p className="truncate font-sans text-[0.6rem] uppercase tracking-[0.1em] text-white/90 leading-tight">
                           {p.nome}
                         </p>
                         <p className="mt-1 font-price text-[0.85rem] font-medium text-gold-soft">

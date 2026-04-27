@@ -27,7 +27,7 @@ export function LuarStory(): JSX.Element {
             className="relative max-w-lg lg:sticky lg:top-32 lg:w-[40%]"
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-10%" }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={easeEditorial}
           >
             {/* Section label */}
@@ -56,7 +56,7 @@ export function LuarStory(): JSX.Element {
                   className="flex gap-4"
                   initial={{ opacity: 0, x: -16 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-5%" }}
+                  viewport={{ once: true, amount: 0.2 }}
                   transition={{ ...easeEditorial, delay: 0.1 + i * 0.1 }}
                 >
                   <div className="mt-2 h-3 w-px flex-shrink-0 bg-gold-soft/48" />
@@ -85,7 +85,7 @@ export function LuarStory(): JSX.Element {
               className="relative ml-0 w-[94%] max-w-2xl self-end overflow-hidden lg:w-[90%]"
               initial={{ opacity: 0, y: 44 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-8%" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ ...easeEditorial, delay: 0.08 }}
             >
               <img
@@ -105,7 +105,7 @@ export function LuarStory(): JSX.Element {
               className="relative -mt-4 w-[72%] max-w-md self-start overflow-hidden sm:-mt-8 lg:-ml-4"
               initial={{ opacity: 0, y: 44 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-8%" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ ...easeEditorial, delay: 0.18 }}
             >
               <img

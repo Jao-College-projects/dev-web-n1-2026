@@ -77,7 +77,7 @@ export function HomeDashboard(): JSX.Element {
                     desfocado ? " manifesto-spread-card--desfocado" : ""
                   }`}
                 >
-                  <img src={produto.imagem} alt="" className="manifesto-spread-img" />
+                  <img src={produto.imagem} alt="" className="manifesto-spread-img" loading="lazy" />
                 </Link>
               ))}
             </div>

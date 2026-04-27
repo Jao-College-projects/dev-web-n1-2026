@@ -26,6 +26,13 @@ export function EditableDepoimentoImageField({
   
   const urlAtual = depoimento.imagem || fallbackSrc;
 
+  const placeholderStyle: React.CSSProperties = {
+    background: '#d6d3d1',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+
   const handleFileChange = async (evento: React.ChangeEvent<HTMLInputElement>) => {
     const arquivo = evento.target.files?.[0];
     if (!arquivo) return;
@@ -59,7 +66,15 @@ export function EditableDepoimentoImageField({
   if (isAdmin && modoEdicao) {
     return (
       <div className={`relative group pointer-events-none ${className ?? ""}`} style={style}>
-        <img src={urlAtual || fallbackSrc} alt={alt} className={`w-full h-full object-cover transition-opacity ${carregando ? 'opacity-50' : ''}`} />
+        {urlAtual ? (
+          <img src={urlAtual} alt={alt} className={`w-full h-full object-cover transition-opacity ${carregando ? 'opacity-50' : ''}`} />
+        ) : (
+          <div className="w-full h-full" style={{ ...placeholderStyle, opacity: carregando ? 0.5 : 1 }}>
+            <span style={{ fontSize: '3rem', color: '#78716c', fontFamily: 'Georgia, serif' }}>
+              {depoimento.cliente?.charAt(0) ?? '?'}
+            </span>
+          </div>
+        )}
         
         <input 
           type="file" 
@@ -108,5 +123,15 @@ export function EditableDepoimentoImageField({
     );
   }
 
-  return <img src={urlAtual || fallbackSrc} alt={alt} className={className} style={style} />;
+  if (!urlAtual) {
+    return (
+      <div className={className} style={{ ...style, ...placeholderStyle }}>
+        <span style={{ fontSize: '3rem', color: '#78716c', fontFamily: 'Georgia, serif' }}>
+          {depoimento.cliente?.charAt(0) ?? '?'}
+        </span>
+      </div>
+    );
+  }
+
+  return <img src={urlAtual} alt={alt} className={className} style={style} />;
 }

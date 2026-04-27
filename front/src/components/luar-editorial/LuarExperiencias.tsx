@@ -61,7 +61,7 @@ export function LuarExperiencias(): JSX.Element {
             className="mb-16 md:mb-24"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-10%" }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={easeEditorial}
           >
             <div className="mb-5 flex items-center gap-3">
@@ -111,7 +111,7 @@ export function LuarExperiencias(): JSX.Element {
                 >
                   <EditableDepoimentoImageField
                     depoimento={dep}
-                    fallbackSrc={`https://picsum.photos/seed/cliente-${dep.id}/800/1000`}
+                    fallbackSrc=""
                     alt={dep.cliente}
                     className="h-full w-full object-cover"
                   />
@@ -291,7 +291,7 @@ export function LuarExperiencias(): JSX.Element {
 
               <EditableDepoimentoImageField
                 depoimento={modal}
-                fallbackSrc={`https://picsum.photos/seed/cliente-${modal.id}/1200/600`}
+                fallbackSrc=""
                 className="h-56 w-full object-cover sm:h-72"
               />
 

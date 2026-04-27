@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(del *)",
+      "Bash(grep -v \":0$\")",
+      "Bash(xargs grep *)",
+      "Bash(xargs wc *)",
+      "Bash(xargs -0 grep -l \"TODO\\\\|FIXME\\\\|HACK\")",
+      "Bash(npm install *)"
+    ]
+  }
+}

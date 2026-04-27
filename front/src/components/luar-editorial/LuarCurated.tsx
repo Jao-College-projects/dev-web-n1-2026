@@ -63,7 +63,7 @@ function PieceBlock({
       className={`group relative overflow-hidden bg-stone-100 ${className}`}
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10%" }}
+      viewport={{ once: true, amount: 0.2 }}
       transition={{ ...easeEditorial, duration: 0.9 }}
     >
       <div className={`relative w-full overflow-hidden ${sizesClass || "min-h-[280px]"}`}>
@@ -155,8 +155,8 @@ export function LuarCurated(): JSX.Element {
   
   const getPiece = (index: number) => {
     try {
-      const p = rawPieces[index] || {};
-      const d = (piecesFallback && piecesFallback[index]) ? piecesFallback[index] : (piecesFallback ? piecesFallback[0] : {});
+      const p = (rawPieces[index] || {}) as { name?: string; verse?: string; image?: string; num?: string };
+      const d = ((piecesFallback && piecesFallback[index]) ? piecesFallback[index] : (piecesFallback ? piecesFallback[0] : {})) as { name?: string; verse?: string; image?: string; num?: string };
       
       const safeStr = (val: any, fallback: string) => {
         if (typeof val === 'string') return val;
@@ -170,10 +170,8 @@ export function LuarCurated(): JSX.Element {
         image: safeStr(p.image, d.image || ""),
         num: safeStr(p.num, d.num || "")
       };
-      console.log(`DEBUG: Processada peça ${index}:`, pieceData);
       return pieceData;
     } catch (err) {
-      console.error("DEBUG: Erro ao processar peça:", index, err);
       return { name: "Peça", verse: "", image: "", num: "I" };
     }
   };
@@ -200,7 +198,7 @@ export function LuarCurated(): JSX.Element {
   };
 
   const handleRemoverPeca = (index: number) => {
-    const newPieces = rawPieces.filter((_, i) => i !== index);
+    const newPieces = rawPieces.filter((_: unknown, i: number) => i !== index);
     atualizarSecaoHome('curadoria', {
       ...curadoriaSecao!,
       conteudo: { ...conteudo, pieces: newPieces }
@@ -320,7 +318,7 @@ export function LuarCurated(): JSX.Element {
           </div>
  
           {/* Extra pieces in a grid */}
-          {extras.map((piece, idx) => (
+          {extras.map((piece: { name?: string; verse?: string; image?: string; num?: string }, idx: number) => (
             <div key={idx + 4} className="lg:col-span-4">
               <PieceBlock
                 {...piece}

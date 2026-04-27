@@ -7,11 +7,9 @@ export function AuthPage(): JSX.Element {
   const navigate = useNavigate();
 
   const [isLogin, setIsLogin] = useState(true);
-
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [nomeCompleto, setNomeCompleto] = useState("");
-
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState("");
@@ -21,15 +19,14 @@ export function AuthPage(): JSX.Element {
     setErro("");
     setMensagemSucesso("");
     setLoading(true);
-
     try {
       if (isLogin) {
-        await login({ email, senha, tipoUsuario: "normal" });
+        await login({ email, senha });
         navigate("/");
       } else {
         await cadastrar({ email, senha, nomeCompleto });
-        setMensagemSucesso("Cadastro realizado com sucesso! Verifique seu email se necessário, ou tente fazer login.");
-        setIsLogin(true); // Muda para a tela de login
+        setMensagemSucesso("Cadastro realizado! Verifique seu email se necessário, ou tente fazer login.");
+        setIsLogin(true);
       }
     } catch (err: any) {
       setErro(err.message || "Ocorreu um erro durante a autenticação.");
@@ -38,106 +35,121 @@ export function AuthPage(): JSX.Element {
     }
   }
 
-  return (
-    <div className="flex min-h-[60vh] items-center justify-center py-12">
-      <div className="w-full max-w-[440px] border border-stone-200/60 bg-white p-10 shadow-[0_8px_40px_-12px_rgba(28,25,23,0.10)]">
-        <div className="border-t-2 border-gold-soft mb-8" />
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    border: "1px solid #d6d3d1",
+    background: "white",
+    padding: "0.75rem 1rem",
+    fontFamily: "'Inter', system-ui, sans-serif",
+    fontSize: "0.9rem",
+    color: "#1c1917",
+    outline: "none",
+    transition: "border-color 0.3s ease, box-shadow 0.3s ease"
+  };
 
-        <div className="w-full">
-          {/* Brand */}
-          <div className="mb-8 text-center">
-            <p className="font-display text-[1.6rem] font-light italic tracking-[0.02em] text-charcoal">
-              Luar Móveis
-            </p>
-            <div className="mx-auto mt-3 h-px w-10 bg-gold-soft/55" />
+  return (
+    <div className="d-flex min-vh-60 align-items-center justify-content-center py-5">
+      <div className="auth-card">
+        <div className="border-top border-2 mb-4" style={{ borderColor: "#c9a86a" }} />
+
+        {/* Marca */}
+        <div className="text-center mb-4">
+          <p className="font-display fw-light fst-italic text-charcoal" style={{ fontSize: "1.6rem", letterSpacing: "0.02em" }}>
+            Luar Móveis
+          </p>
+          <div className="mx-auto mt-3" style={{ height: "1px", width: "2.5rem", background: "rgba(201,168,106,0.55)" }} />
+        </div>
+
+        <h1 className="font-display fw-medium text-charcoal mb-4" style={{ fontSize: "1.6rem" }}>
+          {isLogin ? "Entrar na conta" : "Criar conta"}
+        </h1>
+
+        {erro && (
+          <div className="mb-4 border border-red-200 bg-red-50 p-3 text-center text-red-600" style={{ fontSize: "0.875rem" }}>
+            {erro}
+          </div>
+        )}
+
+        {mensagemSucesso && (
+          <div className="mb-4 border border-green-200 bg-green-50 p-3 text-center text-green-700" style={{ fontSize: "0.875rem" }}>
+            {mensagemSucesso}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
+          {!isLogin && (
+            <div>
+              <label className="d-block font-sans fw-medium text-charcoal uppercase tracking-widest mb-2" style={{ fontSize: "0.65rem", opacity: 0.65 }}>
+                Nome completo
+              </label>
+              <input
+                type="text"
+                value={nomeCompleto}
+                onChange={e => setNomeCompleto(e.target.value)}
+                required={!isLogin}
+                style={inputStyle}
+                placeholder="Seu nome"
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="d-block font-sans fw-medium text-charcoal uppercase tracking-widest mb-2" style={{ fontSize: "0.65rem", opacity: 0.65 }}>
+              E-mail
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              style={inputStyle}
+              placeholder="seu@email.com"
+            />
           </div>
 
-          <h1 className="mb-7 font-display text-[1.6rem] font-medium text-charcoal">
-            {isLogin ? "Entrar na conta" : "Criar conta"}
-          </h1>
+          <div>
+            <label className="d-block font-sans fw-medium text-charcoal uppercase tracking-widest mb-2" style={{ fontSize: "0.65rem", opacity: 0.65 }}>
+              Senha
+            </label>
+            <input
+              type="password"
+              value={senha}
+              onChange={e => setSenha(e.target.value)}
+              required
+              style={inputStyle}
+              placeholder="••••••••"
+            />
+          </div>
 
-          {erro && (
-            <div className="mb-6 border border-red-200 bg-red-50 p-3 text-center text-sm text-red-600">
-              {erro}
-            </div>
-          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-100 font-sans fw-medium uppercase text-cream transition-smooth mt-2"
+            style={{
+              padding: "1rem",
+              fontSize: "0.72rem",
+              letterSpacing: "0.3em",
+              background: "#1c1917",
+              border: "1px solid #1c1917",
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? "not-allowed" : "pointer"
+            }}
+          >
+            {loading ? "Aguarde..." : isLogin ? "Entrar" : "Criar conta"}
+          </button>
 
-          {mensagemSucesso && (
-            <div className="mb-6 border border-green-200 bg-green-50 p-3 text-center text-sm text-green-700">
-              {mensagemSucesso}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {!isLogin && (
-              <div>
-                <label className="mb-2 block font-sans text-[0.65rem] font-medium uppercase tracking-[0.25em] text-charcoal/65">
-                  Nome completo
-                </label>
-                <input
-                  type="text"
-                  value={nomeCompleto}
-                  onChange={(e) => setNomeCompleto(e.target.value)}
-                  required={!isLogin}
-                  className="w-full border border-stone-300 bg-white px-4 py-3 font-sans text-[0.9rem] text-charcoal placeholder:text-mist/40 outline-none transition focus:border-charcoal focus:shadow-[0_0_0_3px_rgba(28,25,23,0.08)]"
-                  placeholder="Seu nome"
-                />
-              </div>
-            )}
-
-            <div>
-              <label className="mb-2 block font-sans text-[0.65rem] font-medium uppercase tracking-[0.25em] text-charcoal/65">
-                E-mail
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full border border-stone-300 bg-white px-4 py-3 font-sans text-[0.9rem] text-charcoal placeholder:text-mist/40 outline-none transition focus:border-charcoal focus:shadow-[0_0_0_3px_rgba(28,25,23,0.08)]"
-                placeholder="seu@email.com"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block font-sans text-[0.65rem] font-medium uppercase tracking-[0.25em] text-charcoal/65">
-                Senha
-              </label>
-              <input
-                type="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                required
-                className="w-full border border-stone-300 bg-white px-4 py-3 font-sans text-[0.9rem] text-charcoal outline-none transition focus:border-charcoal focus:shadow-[0_0_0_3px_rgba(28,25,23,0.08)]"
-                placeholder="••••••••"
-              />
-            </div>
-
+          <p className="text-center font-sans mb-0" style={{ fontSize: "0.75rem", color: "rgba(120,113,108,0.7)" }}>
+            {isLogin ? "Não tem conta?" : "Já tem conta?"}{" "}
             <button
-              type="submit"
-              disabled={loading}
-              className="group relative mt-2 w-full overflow-hidden border border-charcoal bg-charcoal py-4 font-sans text-[0.72rem] font-medium uppercase tracking-[0.3em] text-cream transition-all duration-700 hover:bg-charcoal/88 disabled:opacity-70"
+              type="button"
+              onClick={() => { setIsLogin(!isLogin); setErro(""); setMensagemSucesso(""); }}
+              className="border-0 bg-transparent p-0 text-charcoal text-decoration-underline transition-colors-custom hover-gold"
+              style={{ fontSize: "0.75rem" }}
             >
-              <span className="relative z-10">{loading ? "Aguarde..." : (isLogin ? "Entrar" : "Criar conta")}</span>
-              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/8 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              {isLogin ? "Criar conta" : "Entrar"}
             </button>
-
-            <p className="text-center font-sans text-[0.75rem] text-mist/70">
-              {isLogin ? "Não tem conta?" : "Já tem conta?"}{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setErro("");
-                  setMensagemSucesso("");
-                }}
-                className="text-charcoal underline underline-offset-2 hover:text-gold-soft transition"
-              >
-                {isLogin ? "Criar conta" : "Entrar"}
-              </button>
-            </p>
-          </form>
-        </div>
+          </p>
+        </form>
       </div>
     </div>
   );

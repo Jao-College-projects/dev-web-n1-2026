@@ -37,7 +37,7 @@ export function LuarAmbientes(): JSX.Element {
   const atmosferaSecao = secoesHome.find(s => s.identificador === 'atmosfera');
   const conteudo = atmosferaSecao?.conteudo || {};
 
-  const listaAmbientes = conteudo.ambientes?.length > 0 ? conteudo.ambientes : ambientesFallback;
+  const listaAmbientes = conteudo.ambientes && conteudo.ambientes.length > 0 ? conteudo.ambientes : ambientesFallback;
 
   return (
     <section id="ambientes" className="bg-parchment/25 py-20 md:py-28">
@@ -48,7 +48,7 @@ export function LuarAmbientes(): JSX.Element {
           className="flex items-end justify-between"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-10%" }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={easeEditorial}
         >
           <div>
@@ -96,14 +96,14 @@ export function LuarAmbientes(): JSX.Element {
                     conteudoKey={["ambientes", i, "image"]}
                     fallbackSrc={fallbackImg}
                     alt={amb.title}
-                    className="h-full w-full scale-100 object-cover transition duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
+                    className="h-full w-full scale-100 object-cover transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                   />
                 </div>
 
                 {/* Gradiente base — sempre visível */}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/25 to-transparent" />
                 {/* Escurecimento no hover */}
-                <div className="pointer-events-none absolute inset-0 bg-stone-950/0 transition duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:bg-stone-950/30" />
+                <div className="pointer-events-none absolute inset-0 bg-stone-950/0 transition duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:bg-stone-950/30" />
 
                 {/* Número faint — topo direito */}
                 <div className="absolute right-5 top-5" aria-hidden>

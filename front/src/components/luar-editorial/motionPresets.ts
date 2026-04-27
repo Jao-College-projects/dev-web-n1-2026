@@ -1,7 +1,7 @@
 import type { Transition, Variants } from "framer-motion";
 
 export const easeEditorial: Transition = {
-  duration: 1.15,
+  duration: 0.65,
   ease: [0.22, 1, 0.36, 1],
 };
 
@@ -17,11 +17,10 @@ export const staggerChildren: Variants = {
 };
 
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 28, filter: "blur(6px)" },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: easeEditorial,
   },
 };

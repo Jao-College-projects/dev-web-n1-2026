@@ -26,13 +26,18 @@ export function CarrinhoPage(): JSX.Element {
         </h1>
       </motion.div>
 
-      {/* Cards de produtos — full width breakout */}
-      <div className="-mx-[6vw]">
-        <div className="bg-white px-[6vw] py-10">
+      {/* Conteúdo — Bootstrap Grid assimétrico */}
+      <main className="row g-5">
+        <section className="col-12 col-lg-8">
           <TabelaCarrinho />
-        </div>
-        <ResumoCarrinho />
-      </div>
+        </section>
+
+        <aside className="col-12 col-lg-4">
+          <div className="sticky-top" style={{ top: "7rem" }}>
+            <ResumoCarrinho />
+          </div>
+        </aside>
+      </main>
     </div>
   );
 }

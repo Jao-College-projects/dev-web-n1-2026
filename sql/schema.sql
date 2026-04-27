@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS public.pedidos (
     usuario_id UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
     status VARCHAR(50) DEFAULT 'carrinho' CHECK (status IN ('carrinho', 'pago', 'enviado', 'entregue', 'cancelado')),
     total NUMERIC(10, 2) DEFAULT 0.00,
+    dados_entrega JSONB DEFAULT '{}'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -148,6 +149,9 @@ CREATE POLICY "Admin pode modificar pedidos gerais" ON public.pedidos FOR UPDATE
 -- Regras p/ itens pedido
 CREATE POLICY "Usuario enxerga proprios itens do pedido" ON public.itens_pedido FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.pedidos WHERE public.pedidos.id = pedido_id AND public.pedidos.usuario_id = auth.uid()) OR public.is_admin()
+);
+CREATE POLICY "Usuario insere itens do pedido" ON public.itens_pedido FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM public.pedidos WHERE id = pedido_id AND usuario_id = auth.uid())
 );
 CREATE POLICY "Admin gereitens_pedido geral" ON public.itens_pedido FOR ALL USING (public.is_admin());
 

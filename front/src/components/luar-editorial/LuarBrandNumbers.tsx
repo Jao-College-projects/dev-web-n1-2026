@@ -44,7 +44,7 @@ export function LuarBrandNumbers(): JSX.Element {
       <div className="border-b border-stone-800/60 py-5 overflow-hidden">
         <div
           className="flex gap-12 whitespace-nowrap"
-          style={{ animation: "marquee 36s linear infinite" }}
+          style={{ animation: "marquee 36s linear infinite", willChange: "transform", transform: "translateZ(0)" }}
         >
           {[1, 2].map((loop) => (
             <div key={loop} className="flex gap-12 whitespace-nowrap">
@@ -104,7 +104,7 @@ export function LuarBrandNumbers(): JSX.Element {
             className="mb-16 flex items-center gap-3"
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15%" }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={easeEditorial}
           >
             <div className="h-px w-8 bg-gold-soft/70" />
@@ -125,7 +125,7 @@ export function LuarBrandNumbers(): JSX.Element {
                 className="group flex flex-col gap-0"
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
+                viewport={{ once: true, amount: 0.2 }}
                 transition={{ ...easeEditorial, delay: i * 0.12 }}
               >
                 {/* Valor + unidade */}
@@ -186,7 +186,7 @@ export function LuarBrandNumbers(): JSX.Element {
             className="flex flex-col items-center text-center"
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15%" }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ ...easeEditorial, delay: 0.1 }}
           >
             {/* Aspas decorativas */}

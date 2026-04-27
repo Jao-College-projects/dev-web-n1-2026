@@ -38,11 +38,13 @@ export function ExperienciasClientes(): JSX.Element {
                   className="polaroid-card polaroid-card--interactive"
                   onClick={() => setAberto(depoimento)}
                 >
-                  <img
-                    src={`https://picsum.photos/seed/cliente-${depoimento.id}/640/420`}
-                    alt=""
-                    className="polaroid-photo"
-                  />
+                  {depoimento.imagem ? (
+                    <img src={depoimento.imagem} alt="" className="polaroid-photo" loading="lazy" />
+                  ) : (
+                    <div className="polaroid-photo" style={{ background: '#d6d3d1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '2.5rem', color: '#78716c', fontFamily: 'Georgia, serif' }}>{depoimento.cliente.charAt(0)}</span>
+                    </div>
+                  )}
                   <div className="polaroid-caption">
                     <p className="mb-2 polaroid-snippet">{depoimento.texto}</p>
                     <p className="mb-0 polaroid-signature">
@@ -78,11 +80,13 @@ export function ExperienciasClientes(): JSX.Element {
             <button type="button" className="modal-close-btn" onClick={fechar} aria-label="Fechar">
               Fechar
             </button>
-            <img
-              src={`https://picsum.photos/seed/cliente-${aberto.id}/960/600`}
-              alt=""
-              className="modal-experience-image"
-            />
+            {aberto.imagem ? (
+              <img src={aberto.imagem} alt="" className="modal-experience-image" />
+            ) : (
+              <div className="modal-experience-image" style={{ background: '#d6d3d1', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
+                <span style={{ fontSize: '4rem', color: '#78716c', fontFamily: 'Georgia, serif' }}>{aberto.cliente.charAt(0)}</span>
+              </div>
+            )}
             <h3 id="experience-modal-title" className="section-title mt-4 mb-2">
               Experiencia — {aberto.cliente}
             </h3>

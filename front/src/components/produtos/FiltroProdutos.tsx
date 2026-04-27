@@ -17,172 +17,196 @@ interface FiltroProdutosProps {
 
 export function FiltroProdutos({
   produtos,
-  filtroCategoria,
-  setFiltroCategoria,
-  filtroPreco,
-  setFiltroPreco,
-  filtroEstoque,
-  setFiltroEstoque,
-  viewMode,
-  setViewMode
+  filtroCategoria, setFiltroCategoria,
+  filtroPreco, setFiltroPreco,
+  filtroEstoque, setFiltroEstoque,
+  viewMode, setViewMode
 }: FiltroProdutosProps): JSX.Element {
   const [isCatOpen, setIsCatOpen] = useState(false);
   const [isPrecoOpen, setIsPrecoOpen] = useState(false);
-  
+
   const categoriasUnicas = useMemo(() => {
-    const cats = produtos.map(p => p.categoria);
-    return Array.from(new Set(cats)).sort();
+    return Array.from(new Set(produtos.map(p => p.categoria))).sort();
   }, [produtos]);
 
   const handleToggleCategoria = (item: string) => {
-    setFiltroCategoria((prev) => (prev === item ? null : item));
+    setFiltroCategoria(prev => prev === item ? null : item);
     setIsCatOpen(false);
   };
-  
+
   const handleTogglePreco = (item: string) => {
-    setFiltroPreco((prev) => (prev === item ? null : item));
+    setFiltroPreco(prev => prev === item ? null : item);
     setIsPrecoOpen(false);
   };
 
+  const dropdownBtnStyle: React.CSSProperties = {
+    fontSize: "0.72rem",
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    border: "1px solid #e7e5e4",
+    background: "white",
+    borderRadius: "999px",
+    padding: "0.5rem 1.25rem",
+    color: "#1c1917",
+    transition: "border-color 0.3s ease",
+    cursor: "pointer",
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "1rem"
+  };
+
   return (
-    <div className="flex flex-col gap-6 md:gap-10">
-      {/* Grupos de Filtros */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-5 md:gap-8">
-        
-        {/* Categoria Dropdown */}
-        <div className="relative flex flex-col gap-2 md:gap-3">
-          <p className="font-sans text-[0.62rem] font-bold uppercase tracking-[0.25em] text-gold-soft/80">
-            Categoria
-          </p>
-          <button
-            onClick={() => {
-              setIsCatOpen(!isCatOpen);
-              setIsPrecoOpen(false);
-            }}
-            className="flex items-center justify-between gap-4 rounded-full border border-stone-200 bg-white px-4 md:px-5 py-2 md:py-2.5 font-sans text-[0.7rem] md:text-[0.72rem] uppercase tracking-wider text-charcoal transition-all hover:border-gold-soft"
-          >
-            <span className="truncate">{filtroCategoria || "Todas"}</span>
-            <svg className={`flex-shrink-0 transition-transform duration-300 ${isCatOpen ? 'rotate-180' : ''}`} width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor">
-              <path d="M2 4l4 4 4-4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          
-          <AnimatePresence>
-            {isCatOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full left-0 z-[60] mt-2 w-full min-w-[220px] rounded-xl border border-stone-200 bg-white p-2 shadow-2xl backdrop-blur-md"
-              >
-                <button
-                  onClick={() => handleToggleCategoria("")}
-                  className="w-full rounded-lg px-4 py-2 text-left font-sans text-[0.72rem] uppercase tracking-wide text-mist transition hover:bg-stone-50 hover:text-charcoal"
+    <div className="d-flex flex-column gap-4">
+
+      {/* Grupos de filtros */}
+      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-1 g-3">
+
+        {/* Categoria */}
+        <div className="col">
+          <div className="position-relative d-flex flex-column gap-2">
+            <p className="font-sans fw-bold text-gold-soft uppercase mb-1" style={{ fontSize: "0.62rem", letterSpacing: "0.25em" }}>
+              Categoria
+            </p>
+            <button onClick={() => { setIsCatOpen(!isCatOpen); setIsPrecoOpen(false); }} style={dropdownBtnStyle}>
+              <span className="truncate">{filtroCategoria || "Todas"}</span>
+              <svg className="flex-shrink-0 transition-transform-custom" style={{ transform: isCatOpen ? "rotate(180deg)" : "none" }} width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor">
+                <path d="M2 4l4 4 4-4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            <AnimatePresence>
+              {isCatOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+                  className="position-absolute w-100 border border-stone-200 bg-white p-2 shadow"
+                  style={{ top: "100%", left: 0, zIndex: 60, borderRadius: "0.75rem", minWidth: "220px", marginTop: "0.5rem" }}
                 >
-                  Todas as categorias
-                </button>
-                {categoriasUnicas.map((cat) => (
                   <button
-                    key={cat}
-                    onClick={() => handleToggleCategoria(cat)}
-                    className={`w-full rounded-lg px-4 py-2 text-left font-sans text-[0.72rem] uppercase tracking-wide transition ${
-                      filtroCategoria === cat ? "bg-charcoal text-white" : "text-mist hover:bg-stone-50 hover:text-charcoal"
-                    }`}
+                    onClick={() => handleToggleCategoria("")}
+                    className="w-100 text-start border-0 bg-transparent font-sans text-mist uppercase tracking-wide transition-colors-custom"
+                    style={{ padding: "0.5rem 1rem", fontSize: "0.72rem", borderRadius: "0.5rem" }}
                   >
-                    {cat}
+                    Todas as categorias
                   </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  {categoriasUnicas.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => handleToggleCategoria(cat)}
+                      className="w-100 text-start border-0 font-sans uppercase tracking-wide transition-smooth"
+                      style={{
+                        padding: "0.5rem 1rem", fontSize: "0.72rem", borderRadius: "0.5rem",
+                        background: filtroCategoria === cat ? "#1c1917" : "transparent",
+                        color: filtroCategoria === cat ? "white" : "#78716c",
+                        cursor: "pointer"
+                      }}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        {/* Faixa de Preço Dropdown */}
-        <div className="relative flex flex-col gap-2 md:gap-3">
-          <p className="font-sans text-[0.62rem] font-bold uppercase tracking-[0.25em] text-gold-soft/80">
-            Faixa de Preço
-          </p>
-          <button
-            onClick={() => {
-              setIsPrecoOpen(!isPrecoOpen);
-              setIsCatOpen(false);
-            }}
-            className="flex items-center justify-between gap-4 rounded-full border border-stone-200 bg-white px-4 md:px-5 py-2 md:py-2.5 font-sans text-[0.7rem] md:text-[0.72rem] uppercase tracking-wider text-charcoal transition-all hover:border-gold-soft"
-          >
-            <span className="truncate">{filtroPreco || "Qualquer"}</span>
-            <svg className={`flex-shrink-0 transition-transform duration-300 ${isPrecoOpen ? 'rotate-180' : ''}`} width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor">
-              <path d="M2 4l4 4 4-4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          
-          <AnimatePresence>
-            {isPrecoOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full left-0 z-[60] mt-2 w-full min-w-[220px] rounded-xl border border-stone-200 bg-white p-2 shadow-2xl backdrop-blur-md"
-              >
-                <button
-                  onClick={() => handleTogglePreco("")}
-                  className="w-full rounded-lg px-4 py-2 text-left font-sans text-[0.72rem] uppercase tracking-wide text-mist transition hover:bg-stone-50 hover:text-charcoal"
+        {/* Preço */}
+        <div className="col">
+          <div className="position-relative d-flex flex-column gap-2">
+            <p className="font-sans fw-bold text-gold-soft uppercase mb-1" style={{ fontSize: "0.62rem", letterSpacing: "0.25em" }}>
+              Faixa de Preço
+            </p>
+            <button onClick={() => { setIsPrecoOpen(!isPrecoOpen); setIsCatOpen(false); }} style={dropdownBtnStyle}>
+              <span className="truncate">{filtroPreco || "Qualquer"}</span>
+              <svg className="flex-shrink-0 transition-transform-custom" style={{ transform: isPrecoOpen ? "rotate(180deg)" : "none" }} width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor">
+                <path d="M2 4l4 4 4-4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            <AnimatePresence>
+              {isPrecoOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+                  className="position-absolute w-100 border border-stone-200 bg-white p-2 shadow"
+                  style={{ top: "100%", left: 0, zIndex: 60, borderRadius: "0.75rem", minWidth: "220px", marginTop: "0.5rem" }}
                 >
-                  Todos os valores
-                </button>
-                {["Até R$ 2.000", "R$ 2.000 – 5.000", "R$ 5.000 – 10.000", "Acima de R$ 10.000"].map((p) => (
                   <button
-                    key={p}
-                    onClick={() => handleTogglePreco(p)}
-                    className={`w-full rounded-lg px-4 py-2 text-left font-sans text-[0.72rem] uppercase tracking-wide transition ${
-                      filtroPreco === p ? "bg-charcoal text-white" : "text-mist hover:bg-stone-50 hover:text-charcoal"
-                    }`}
+                    onClick={() => handleTogglePreco("")}
+                    className="w-100 text-start border-0 bg-transparent font-sans text-mist uppercase tracking-wide transition-colors-custom"
+                    style={{ padding: "0.5rem 1rem", fontSize: "0.72rem", borderRadius: "0.5rem" }}
                   >
-                    {p}
+                    Todos os valores
                   </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  {["Até R$ 2.000", "R$ 2.000 – 5.000", "R$ 5.000 – 10.000", "Acima de R$ 10.000"].map(p => (
+                    <button
+                      key={p}
+                      onClick={() => handleTogglePreco(p)}
+                      className="w-100 text-start border-0 font-sans uppercase tracking-wide transition-smooth"
+                      style={{
+                        padding: "0.5rem 1rem", fontSize: "0.72rem", borderRadius: "0.5rem",
+                        background: filtroPreco === p ? "#1c1917" : "transparent",
+                        color: filtroPreco === p ? "white" : "#78716c",
+                        cursor: "pointer"
+                      }}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Disponibilidade */}
-        <div className="flex flex-col gap-2 md:gap-3 sm:col-span-2 md:col-span-1">
-          <p className="font-sans text-[0.62rem] font-bold uppercase tracking-[0.25em] text-gold-soft/80">
+        <div className="col">
+          <p className="font-sans fw-bold text-gold-soft uppercase mb-2" style={{ fontSize: "0.62rem", letterSpacing: "0.25em" }}>
             Disponibilidade
           </p>
           <button
             type="button"
-            onClick={() => setFiltroEstoque((prev) => !prev)}
-            className={`rounded-full px-4 md:px-5 py-2 md:py-2.5 font-sans text-[0.7rem] md:text-[0.72rem] uppercase tracking-wider transition-all duration-300 ${
-              filtroEstoque 
-                ? "bg-gold-soft text-stone-900 shadow-md font-bold" 
-                : "bg-white text-mist border border-stone-200 hover:border-gold-soft hover:text-charcoal"
-            }`}
+            onClick={() => setFiltroEstoque(prev => !prev)}
+            className="font-sans uppercase tracking-wide transition-smooth"
+            style={{
+              fontSize: "0.72rem",
+              letterSpacing: "0.1em",
+              padding: "0.5rem 1.25rem",
+              borderRadius: "999px",
+              cursor: "pointer",
+              border: filtroEstoque ? "none" : "1px solid #e7e5e4",
+              background: filtroEstoque ? "#c9a86a" : "white",
+              color: filtroEstoque ? "#1c1917" : "#78716c",
+              fontWeight: filtroEstoque ? 700 : 400,
+              boxShadow: filtroEstoque ? "0 2px 8px rgba(0,0,0,0.1)" : "none"
+            }}
           >
             Em estoque
           </button>
         </div>
       </div>
 
-      {/* Alternador de Visualização */}
-      <div className="flex flex-col gap-3 border-t border-stone-100 pt-8">
-        <p className="font-sans text-[0.62rem] font-bold uppercase tracking-[0.25em] text-mist/60">
+      {/* Alternador de visualização */}
+      <div className="d-flex flex-column gap-3 border-top border-stone-100 pt-4">
+        <p className="font-sans fw-bold text-mist uppercase mb-0" style={{ fontSize: "0.62rem", letterSpacing: "0.25em", opacity: 0.6 }}>
           Visualização
         </p>
-        <div className="flex items-center gap-2 border border-stone-200 bg-white/50 p-1 rounded-full w-fit">
+        <div className="d-inline-flex align-items-center gap-2 border border-stone-200 p-1" style={{ borderRadius: "999px", background: "rgba(255,255,255,0.5)" }}>
           <button
             onClick={() => setViewMode("grid")}
-            className={`p-2 rounded-full transition-all ${viewMode === "grid" ? "bg-charcoal text-white shadow-md" : "text-mist hover:text-charcoal"}`}
+            className="border-0 p-2 transition-smooth"
+            style={{ borderRadius: "999px", background: viewMode === "grid" ? "#1c1917" : "transparent", color: viewMode === "grid" ? "white" : "#78716c", cursor: "pointer" }}
             title="Visualização em Grade"
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
           </button>
           <button
             onClick={() => setViewMode("list")}
-            className={`p-2 rounded-full transition-all ${viewMode === "list" ? "bg-charcoal text-white shadow-md" : "text-mist hover:text-charcoal"}`}
+            className="border-0 p-2 transition-smooth"
+            style={{ borderRadius: "999px", background: viewMode === "list" ? "#1c1917" : "transparent", color: viewMode === "list" ? "white" : "#78716c", cursor: "pointer" }}
             title="Visualização em Lista"
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
           </button>
         </div>
       </div>
